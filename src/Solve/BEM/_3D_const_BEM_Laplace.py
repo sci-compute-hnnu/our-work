@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.sparse.linalg import LinearOperator, gmres, lgmres
 import time
+import matplotlib
 
 
 class BEM_3DCESolver():
