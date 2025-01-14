@@ -220,7 +220,7 @@ class _2DMeshWindow:
 
             """step4. 构建meshClass并载入box1"""
 
-            meshWithGL = FaceMesh(points, cells)
+            meshWithGL = FaceMesh(points, cells, 'triangle')
 
             self.box1.load_Mesh(meshWithGL, name=mesh_name)
 
