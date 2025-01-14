@@ -1057,7 +1057,7 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\x+.png</property>
+                    <property name="pixbuf">../images/MainPage/Default/x+.png</property>
                   </object>
                 </child>
               </object>
@@ -1079,7 +1079,7 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\x-.png</property>
+                    <property name="pixbuf">../images/MainPage/Default/x-.png</property>
                   </object>
                 </child>
               </object>
@@ -1101,7 +1101,7 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\Y+.png</property>
+                    <property name="pixbuf">../images/MainPage/Default/Y+.png</property>
                   </object>
                 </child>
               </object>
@@ -1123,7 +1123,7 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\Y-.png</property>
+                    <property name="pixbuf">../images/MainPage/Default/Y-.png</property>
                   </object>
                 </child>
               </object>
@@ -1146,7 +1146,7 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\z+.png</property>
+                    <property name="pixbuf">../images/MainPage/Default/z+.png</property>
                   </object>
                 </child>
               </object>
@@ -1169,7 +1169,7 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\z-.png</property>
+                    <property name="pixbuf">../images/MainPage/Default/z-.png</property>
                   </object>
                 </child>
               </object>
@@ -1192,7 +1192,7 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\+90.png</property>
+                    <property name="pixbuf">../images/MainPage/Default/+90.png</property>
                   </object>
                 </child>
               </object>
@@ -1215,7 +1215,7 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\-90.png</property>
+                    <property name="pixbuf">../images/MainPage/Default/-90.png</property>
                   </object>
                 </child>
               </object>
@@ -1238,7 +1238,7 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\iso.png</property>
+                    <property name="pixbuf">../images/MainPage/Default/iso.png</property>
                   </object>
                 </child>
               </object>
@@ -1959,7 +1959,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\项目.png</property>
+                        <property name="pixbuf">../images/MainPage/Default/project.png</property>
                       </object>
                     </child>
                   </object>
@@ -1980,7 +1980,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\变量.png</property>
+                        <property name="pixbuf">../images/MainPage/Default/variable.png</property>
                       </object>
                     </child>
                   </object>
@@ -2001,7 +2001,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\插件.png</property>
+                        <property name="pixbuf">../images/MainPage/Default/plugin.png</property>
                       </object>
                     </child>
                   </object>
