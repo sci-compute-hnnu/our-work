@@ -1,0 +1,30 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E265" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="新建文件夹.spark_nine.yfinance.Tickers" />
+          <option value="opengl.ui.test.GdkGL" />
+          <option value="opengl.ui.ui2.GdkGL" />
+          <option value="opengl.ui.test.GtkGL" />
+          <option value="PyQt6.QtMultimediaWidgets.QCameraViewfinder" />
+          <option value="PyQt6.QtMultimedia.QCameraImageCapture" />
+          <option value="PyQt6.QtMultimedia.QCameraInfo" />
+          <option value="urllib2" />
+          <option value="connmysql" />
+          <option value="plotly_express" />
+          <option value="Resources.贝叶斯优化.bayes_opt" />
+          <option value="keras.layers.*" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
