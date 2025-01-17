@@ -391,7 +391,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-			<property name="pixbuf">../images/3DMesh/sphere.png</property>
+                        <property name="pixbuf">../images\3DMesh\sphere.png</property>
                       </object>
                     </child>
                   </object>
@@ -411,7 +411,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-			<property name="pixbuf">../images/3DMesh/box.png</property>
+                        <property name="pixbuf">../images\3DMesh\box.png</property>
                       </object>
                     </child>
                   </object>
@@ -431,7 +431,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-			<property name="pixbuf">../images/3DMesh/other.png</property>
+                        <property name="pixbuf">../images\3DMesh\other.png</property>
                       </object>
                     </child>
                   </object>
@@ -466,7 +466,7 @@
           </packing>
         </child>
         <child>
-          <!-- n-columns=2 n-rows=3 -->
+          <!-- n-columns=2 n-rows=4 -->
           <object class="GtkGrid">
             <property name="width-request">261</property>
             <property name="height-request">46</property>
@@ -548,6 +548,30 @@
                 <property name="top-attach">2</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">mesh name </property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans-Serif Bold 10"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="mesh_name">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">3</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="x">9</property>
@@ -586,7 +610,7 @@
           </object>
           <packing>
             <property name="x">25</property>
-            <property name="y">461</property>
+            <property name="y">497</property>
           </packing>
         </child>
         <child>
@@ -621,7 +645,7 @@
           </object>
           <packing>
             <property name="x">180</property>
-            <property name="y">461</property>
+            <property name="y">497</property>
           </packing>
         </child>
       </object>
