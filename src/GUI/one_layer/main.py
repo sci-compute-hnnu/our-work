@@ -6,6 +6,7 @@ from gi.repository import Gtk, Gdk, GdkPixbuf
 from GUI.one_layer.Mesh._2D_Mesh.main import _2DMeshWindow
 from GUI.one_layer.Mesh._3D_Mesh.main import _3DMeshWindow
 from GUI.one_layer.Solver.BEM.main import BEMSolverWindow
+from GUI.one_layer.Style.main import Style
 
 class one_layer():
 
@@ -18,12 +19,14 @@ class one_layer():
         self.sources_button = builder.get_object("Sources")
         self.mesh_button = builder.get_object("Mesh")
         self.solver_button = builder.get_object("Solver")
+        self.style_button = builder.get_object("Style")
         self.file_button.set_active(False)  # 取消按钮的激活状态
         self.edit_button.set_active(False)
         self.view_button.set_active(False)
         self.sources_button.set_active(False)
         self.mesh_button.set_active(False)
         self.solver_button.set_active(False)
+        self.style_button.set_active(False)
 
 
         """File下拉菜单"""
@@ -41,9 +44,6 @@ class one_layer():
         '''View下拉菜单'''
         self.PB = builder.get_object("PB")
         self.PB.set_active(True)
-
-        self.information = builder.get_object("information")
-        self.information.set_active(True)
 
 
         """Edit下拉菜单"""
@@ -64,12 +64,20 @@ class one_layer():
         """Solver下拉菜单"""
         self.BEM = builder.get_object('BEM')
 
+        """Style下拉菜单"""
+        self.default_style = builder.get_object("Default_style")
+        self.simple_style = builder.get_object("Simple_style")
+        self.dark_style = builder.get_object("Dark_style")
+        self.style = Style(builder)
 
         """其他需要使用的部件"""
         self.box1 = None
         self.noteboox = None
         self.two_layer = None
         self.three_layer = None
+
+        self.information = builder.get_object("information")
+        self.information.set_active(True)
 
 
     # 加载其他需要使用的部件
@@ -138,10 +146,8 @@ class one_layer():
         filebutton.clicked()
 
 
-
     " ---------- Mesh -----------"
     def open_2d_mesh_widonw(self, button):
-
 
         # 获取Mesh name 的默认名字
 
@@ -152,6 +158,7 @@ class one_layer():
     def open_3d_mesh_widonw(self, button):
 
         _3DMeshWin = _3DMeshWindow()
+        _3DMeshWin.loadWidget(self.box1)
         _3DMeshWin.run()
 
 
@@ -162,3 +169,12 @@ class one_layer():
         BEMSolverWin.run()
 
 
+    " ----------Style---------- "
+    def change_style(self, button):
+        label = button.get_label()
+        if label == "Default":
+            self.style.default_style()
+        elif label == "Simple":
+            self.style.set_icons(label)
+        elif label == "Dark":
+            self.style.set_icons(label)
