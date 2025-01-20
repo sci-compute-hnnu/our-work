@@ -6,6 +6,7 @@ from gi.repository import Gtk, Gdk, GdkPixbuf
 from GUI.one_layer.Mesh._2D_Mesh.main import _2DMeshWindow
 from GUI.one_layer.Mesh._3D_Mesh.main import _3DMeshWindow
 from GUI.one_layer.Solver.BEM.main import BEMSolverWindow
+from GUI.one_layer.Style.main import Style
 
 class one_layer():
 
@@ -18,12 +19,14 @@ class one_layer():
         self.sources_button = builder.get_object("Sources")
         self.mesh_button = builder.get_object("Mesh")
         self.solver_button = builder.get_object("Solver")
+        self.style_button = builder.get_object("Style")
         self.file_button.set_active(False)  # 取消按钮的激活状态
         self.edit_button.set_active(False)
         self.view_button.set_active(False)
         self.sources_button.set_active(False)
         self.mesh_button.set_active(False)
         self.solver_button.set_active(False)
+        self.style_button.set_active(False)
 
 
         """File下拉菜单"""
@@ -64,6 +67,12 @@ class one_layer():
         """Solver下拉菜单"""
         self.BEM = builder.get_object('BEM')
 
+        """Style下拉菜单"""
+        self.default_style = builder.get_object("Default_style")
+        self.simple_style = builder.get_object("Simple_style")
+        self.dark_style = builder.get_object("Dark_style")
+
+        self.style = Style(builder)
 
         """其他需要使用的部件"""
         self.box1 = None
@@ -162,3 +171,12 @@ class one_layer():
         BEMSolverWin.run()
 
 
+    " ----------Style---------- "
+    def change_style(self, button):
+        label = button.get_label()
+        if label == "Default":
+            self.style.default_style()
+        elif label == "Simple":
+            self.style.set_icons(label)
+        elif label == "Dark":
+            self.style.set_icons(label)
