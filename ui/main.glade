@@ -252,6 +252,35 @@
       </object>
     </child>
   </object>
+  <object class="GtkMenu" id="sub_style">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="hexpand">True</property>
+    <child>
+      <object class="GtkMenuItem" id="Default_style">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Default</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="Simple_style">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Simple</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="Dark_style">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Dark</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
+  </object>
   <object class="GtkMenu" id="sub_view">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
@@ -473,6 +502,31 @@
                 <property name="position">5</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkMenuButton" id="Style">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="relief">none</property>
+                <property name="active">True</property>
+                <property name="popup">sub_style</property>
+                <property name="use-popover">False</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="width-request">70</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Style</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans 11"/>
+                    </attributes>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="position">6</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -517,7 +571,7 @@
                 <property name="tooltip-text" translatable="yes">Open</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="open_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -537,7 +591,7 @@
                 <property name="tooltip-text" translatable="yes">Save Data</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="download_image">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="pixel-size">25</property>
@@ -559,7 +613,7 @@
                 <property name="tooltip-text" translatable="yes">Save States</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="save_image">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="pixel-size">25</property>
@@ -581,7 +635,7 @@
                 <property name="tooltip-text" translatable="yes">Reset</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="reset_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -604,7 +658,7 @@
                 <property name="tooltip-text" translatable="yes">Undo</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="undo_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -627,7 +681,7 @@
                 <property name="tooltip-text" translatable="yes">Redo</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="redo_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -649,7 +703,7 @@
                 <property name="receives-default">True</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="left1_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -671,7 +725,7 @@
                 <property name="receives-default">True</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="left2_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -693,7 +747,7 @@
                 <property name="receives-default">True</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="left3_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -715,7 +769,7 @@
                 <property name="receives-default">True</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="right3_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -737,7 +791,7 @@
                 <property name="receives-default">True</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="right2_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -759,12 +813,12 @@
                 <property name="receives-default">True</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="right1_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="pixel-size">25</property>
-                    <property name="icon-name">media-playlist-repeat</property>
+                    <property name="icon-name">media-skip-backward-symbolic-rtl</property>
                   </object>
                 </child>
               </object>
@@ -784,7 +838,7 @@
                 </attributes>
               </object>
               <packing>
-                <property name="x">845</property>
+                <property name="x">910</property>
               </packing>
             </child>
             <child>
@@ -801,7 +855,7 @@
                 </child>
               </object>
               <packing>
-                <property name="x">910</property>
+                <property name="x">975</property>
               </packing>
             </child>
             <child>
@@ -813,7 +867,7 @@
                 <property name="receives-default">True</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="camera_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -823,7 +877,7 @@
                 </child>
               </object>
               <packing>
-                <property name="x">1110</property>
+                <property name="x">1175</property>
               </packing>
             </child>
             <child>
@@ -835,7 +889,7 @@
                 <property name="receives-default">True</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="no_camera_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -845,7 +899,7 @@
                 </child>
               </object>
               <packing>
-                <property name="x">1175</property>
+                <property name="x">1240</property>
               </packing>
             </child>
             <child>
@@ -860,7 +914,7 @@
                 <property name="popup">sub_color</property>
                 <property name="use-popover">False</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="color_image">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="pixel-size">25</property>
@@ -870,6 +924,28 @@
               </object>
               <packing>
                 <property name="x">390</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="width-request">65</property>
+                <property name="height-request">50</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="relief">none</property>
+                <child>
+                  <object class="GtkImage" id="circle_image">
+                    <property name="width-request">50</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="pixel-size">25</property>
+                    <property name="icon-name">media-playlist-repeat</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="x">845</property>
               </packing>
             </child>
           </object>
@@ -905,7 +981,7 @@
                 <property name="tooltip-text" translatable="yes">Color Legend</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="legend_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -925,7 +1001,7 @@
                 <property name="tooltip-text" translatable="yes">Select Color</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="gmsh_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -948,7 +1024,7 @@
                 <property name="tooltip-text" translatable="yes">Zoom In</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="zoomout_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -971,7 +1047,7 @@
                 <property name="tooltip-text" translatable="yes">Zoom Out</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="zoomin_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1053,11 +1129,11 @@
                 <property name="tooltip-text" translatable="yes">Set view direction to +x</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="+x_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images/MainPage/Default/x+.png</property>
+                    <property name="pixbuf">../images\MainPage\Default\x+.png</property>
                   </object>
                 </child>
               </object>
@@ -1075,11 +1151,11 @@
                 <property name="tooltip-text" translatable="yes">Set view direction to -x</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="-x_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images/MainPage/Default/x-.png</property>
+                    <property name="pixbuf">../images\MainPage\Default\x-.png</property>
                   </object>
                 </child>
               </object>
@@ -1097,11 +1173,11 @@
                 <property name="tooltip-text" translatable="yes">Set view direction to +y</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="+y_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images/MainPage/Default/Y+.png</property>
+                    <property name="pixbuf">../images\MainPage\Default\Y+.png</property>
                   </object>
                 </child>
               </object>
@@ -1119,11 +1195,11 @@
                 <property name="tooltip-text" translatable="yes">Set view direction to -y</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="-y_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images/MainPage/Default/Y-.png</property>
+                    <property name="pixbuf">../images\MainPage\Default\Y-.png</property>
                   </object>
                 </child>
               </object>
@@ -1142,11 +1218,11 @@
                 <property name="tooltip-text" translatable="yes">Set view direction to +z</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="+z_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images/MainPage/Default/z+.png</property>
+                    <property name="pixbuf">../images\MainPage\Default\z+.png</property>
                   </object>
                 </child>
               </object>
@@ -1165,11 +1241,11 @@
                 <property name="tooltip-text" translatable="yes">Set view direction to -z</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="-z_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images/MainPage/Default/z-.png</property>
+                    <property name="pixbuf">../images\MainPage\Default\z-.png</property>
                   </object>
                 </child>
               </object>
@@ -1188,11 +1264,11 @@
                 <property name="tooltip-text" translatable="yes">rotate 90 degrees clockwise</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="right_90_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images/MainPage/Default/+90.png</property>
+                    <property name="pixbuf">../images\MainPage\Default\right_90.png</property>
                   </object>
                 </child>
               </object>
@@ -1211,11 +1287,11 @@
                 <property name="tooltip-text" translatable="yes">rotate 90 degrees counterclockwise</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="left_90_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images/MainPage/Default/-90.png</property>
+                    <property name="pixbuf">../images\MainPage\Default\left_90.png</property>
                   </object>
                 </child>
               </object>
@@ -1234,11 +1310,11 @@
                 <property name="tooltip-text" translatable="yes">apply isometric view</property>
                 <property name="relief">none</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="axis_image">
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images/MainPage/Default/iso.png</property>
+                    <property name="pixbuf">../images\MainPage\Default\axis.png</property>
                   </object>
                 </child>
               </object>
@@ -1956,10 +2032,10 @@
                     <property name="tooltip-text" translatable="yes">Project</property>
                     <property name="relief">half</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="project_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images/MainPage/Default/project.png</property>
+                        <property name="pixbuf">../images\MainPage\Default\project.png</property>
                       </object>
                     </child>
                   </object>
@@ -1977,10 +2053,10 @@
                     <property name="tooltip-text" translatable="yes">Variables</property>
                     <property name="relief">half</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="var_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images/MainPage/Default/variable.png</property>
+                        <property name="pixbuf">../images\MainPage\Default\variable.png</property>
                       </object>
                     </child>
                   </object>
@@ -1998,10 +2074,10 @@
                     <property name="tooltip-text" translatable="yes">Plugin</property>
                     <property name="relief">half</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="plugin_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images/MainPage/Default/plugin.png</property>
+                        <property name="pixbuf">../images\MainPage\Default\plugin.png</property>
                       </object>
                     </child>
                   </object>
