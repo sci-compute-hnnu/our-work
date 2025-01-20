@@ -1,10 +1,12 @@
-import gmsh
 import numpy as np
 import gi
 import meshio
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+
+from Pre.MeshGeneration import _3D_generate_mesh
+from Utils.Mesh.MeshClass import BodyMesh
 
 
 class _3DMeshWindow:
@@ -38,6 +40,7 @@ class _3DMeshWindow:
         self.algorithm = self.builder.get_object("algorithm")
         self.mesh_type = self.builder.get_object("mesh_type")
         self.size = self.builder.get_object("size")
+        self.mesh_name_entry = self.builder.get_object("mesh_name")
 
         # 动态设置参数的堆叠容器
         self.para = self.builder.get_object("para")
@@ -77,6 +80,13 @@ class _3DMeshWindow:
         # 隐藏所有参数输入框
         self.hide_all_parameter_inputs()
 
+        # box1
+        self.box1 = None
+
+    # 加载需要使用的部件
+    def loadWidget(self, box1):
+        self.box1 = box1
+
     def hide_all_parameter_inputs(self):
         for widget in [self.page_cube, self.page_sphe, self.page_other]:
             widget.hide()
@@ -111,6 +121,14 @@ class _3DMeshWindow:
         if default_iter is not None:
             combo_box.set_active_iter(default_iter)
 
+    def update_mesh_name(self, shape_type):
+        """确认Mesh name框中的默认名字字符串"""
+        existing_names = [row[1] for row in self.box1.list_store]
+        count = 1
+        while f"{shape_type}{count}" in existing_names:
+            count += 1
+        self.mesh_name_entry.set_text(f"{shape_type}{count}")
+
     def on_button_cube_clicked(self, button):
         # 切换到 Circle 页面并更新选项
         self.hide_all_parameter_inputs()
@@ -128,6 +146,7 @@ class _3DMeshWindow:
             "2:Surface",
             "3:Volume"
         ], "Volume")
+        self.update_mesh_name("cube")
 
     def on_button_sphe_clicked(self, button):
         # 切换到 Rectangle 页面并更新选项
@@ -147,6 +166,7 @@ class _3DMeshWindow:
             "2:Surface",
             "3:Volume"
         ], "Volume")
+        self.update_mesh_name("sphere")
 
     def on_button_other_clicked(self, button):
         # 切换到 other 页面并更新选项
@@ -165,23 +185,23 @@ class _3DMeshWindow:
             "2:Surface",
             "3:Volume"
         ], "Volume")
+        self.update_mesh_name("other")
 
 
     def on_confirm_clicked(self, button):
-        # 获取当前页面
+        """step0. 获取Mesh name框中的名字"""
+        mesh_name = self.mesh_name_entry.get_text()
+
+        """step1. 获取当前界面的绘制信息"""
         current_page = self.para_stack.get_visible_child_name()
         model = self.algorithm.get_model()
-        # 所选中的算法
+
         algorithm_selected = self.algorithm.get_active_iter()
         algorithm = model.get_value(algorithm_selected, 0).split("：")[0]
-        # 获取网格类型
         type_selected = self.mesh_type.get_active_iter()
         type_value = model.get_value(algorithm_selected, 0).split("：")[0]
-
-        # 获取网格尺寸
         size_value = float(self.size.get_text())
 
-        # 根据当前页面获取相应的 Entry
         if current_page == "Box":
             entries = [
                 self.cu_x_entry, self.cu_y_entry, self.cu_z_entry,
@@ -202,111 +222,29 @@ class _3DMeshWindow:
         else:
             shape = None
 
-        # 调用 generate_mesh 方法
+        """step2.调用gmsh算法 生成网格"""
         if shape:
-            self.generate_mesh(shape, size_value, algorithm, type_value)
-            node_tags, node_coords, _ = gmsh.model.mesh.getNodes()
+            node_coords, element_nodes, element_tags, cells = (_3D_generate_mesh(shape, size_value, algorithm, type_value))
 
             # 将节点坐标转换为 NumPy 数组
             points = np.array(node_coords).reshape(-1, 3)
 
-            # 计算和打印统计信息
+            """step3. 设置information框输出信息"""
             num_points = points.shape[0]
-
-            # 获取元素数据
-            element_tags, element_types, element_nodes = gmsh.model.mesh.getElements()
 
             # 计算元素总数
             total_elements = sum(len(nodes) for nodes in element_nodes)
             # 打印
             info = f"Mesh generated with:\n {num_points} points \n {total_elements} cells\n Algorithm: \n {algorithm}"
-            print(info)
-            gmsh.finalize()
-            # # 打印网格信息
-            # elementType = 'triangle'
-            # featureEdge = 'line'
-            # meshio_mesh = meshio.Mesh(points=mesh.points, cells={elementType: mesh.cells_dict[elementType]})
-            # line = meshio.Mesh(points=mesh.points, cells=[(featureEdge, mesh.cells_dict[featureEdge])])
-            #
-            # nodeNumber = meshio_mesh.points.shape[0]
-            # elementNumber = meshio_mesh.cells_dict[elementType].shape[0]
-            # info = f"Mesh generated with:\n {nodeNumber} points \n {elementNumber} cells \n Algorithm: \n {algorithm}"
-            # info = f"Mesh generated with:\n {len(mesh.points)} points \n  {len(mesh.cells)} cells \nAlgorithm:\n{algorithm}"
-            # buffer = self.information_textview.get_buffer()
-            # buffer.set_text(info)
+            self.box1.info_print(info)
 
-            # 这里可以添加进一步处理网格的代码，例如保存或可视化
+            """step4. 构建meshClass并载入box1"""
+            meshWithGL = BodyMesh(points, cells)
 
-    def generate_mesh(self, shape, mesh_size, algorithm, mesh_type):
-        gmsh.initialize()
-        gmsh.model.add("model")
-        if shape[0] == "box":
-            gmsh.model.occ.addBox(shape[1],  shape[2], shape[3] , shape[4], shape[5], shape[6])
-        elif shape[0] == "sphere":
-            gmsh.model.occ.addSphere(shape[1], shape[2], shape[3], shape[4])
-        elif shape[0] == "other":
-            # 定义点和面
-            point = shape[1]
-            face = shape[2]
+            self.box1.load_Mesh(meshWithGL, name=mesh_name)
 
-            # 添加点
-            points = [gmsh.model.occ.addPoint(*pt, mesh_size) for pt in point]
-
-            # 创建一个存储线段的字典
-            lines_dict = {}
-            lines = []
-
-            # 添加线段
-            def add_line(p1, p2):
-                if (p1, p2) not in lines_dict and (p2, p1) not in lines_dict:
-                    line_id = gmsh.model.occ.addLine(p1, p2)
-                    lines_dict[(p1, p2)] = line_id
-                    lines_dict[(p2, p1)] = line_id
-                    return line_id
-                return lines_dict.get((p1, p2)) or lines_dict.get((p2, p1))
-
-            for f in face:
-                for i in range(len(f)):
-                    p1 = f[i]
-                    p2 = f[(i + 1) % len(f)]
-                    add_line(p1, p2)
-
-            # 根据存储的线段定义线环
-            def get_curve_loop(vertex_ids):
-                loop_lines = []
-                for i in range(len(vertex_ids)):
-                    p1 = vertex_ids[i]
-                    p2 = vertex_ids[(i + 1) % len(vertex_ids)]
-                    line_id = lines_dict.get((p1, p2)) or lines_dict.get((p2, p1))
-                    if line_id is not None:
-                        loop_lines.append(line_id)
-                    else:
-                        raise ValueError(f"Line segment ({p1}, {p2}) not found in lines_dict.")
-                return gmsh.model.occ.addCurveLoop(loop_lines)
-
-            # 生成面环（face loops）
-            def generate_face_loops(faces):
-                face_loops = []
-                for face in faces:
-                    face_loop = get_curve_loop(face)
-                    face_loops.append(face_loop)
-                return face_loops
-
-            # 计算面环
-            face_loops = generate_face_loops(face)
-
-            # 添加面
-            faces = [gmsh.model.occ.addPlaneSurface([loop]) for loop in face_loops]
-
-            # 创建体
-            surface_loop = gmsh.model.occ.addSurfaceLoop(faces)
-            gmsh.model.occ.addVolume([surface_loop])
-
-        # 同步几何模型
-        gmsh.model.occ.synchronize()
-        gmsh.model.mesh.setSize(gmsh.model.getEntities(0), mesh_size)
-        gmsh.option.setNumber("Mesh.Algorithm3D", int(algorithm))
-        gmsh.model.mesh.generate(int(mesh_type))
+            """step5. 关闭窗口"""
+            self.window.close()
 
 
     def on_cancel_clicked(self, button):

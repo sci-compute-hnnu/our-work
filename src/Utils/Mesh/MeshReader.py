@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 from Utils.Mesh.MeshClass import FaceMesh, BodyMesh
-from Utils.Mesh.GeometryUtils import change_to_triangle, determine_tetra_or_quad
+from Utils.Mesh.GeometryUtils import determine_tetra_or_quad
 
 """
 meshio 支持一系列的网格单元类型"""
@@ -103,23 +103,17 @@ def read_dat(file):
             elif len(face) == 4:
                 quadrilateral.append(face)
 
-
-        triangle = np.array(triangle).flatten()
-        triangle = np.array(triangle, dtype=np.uint32)
-
-        quadrilateral = np.array(quadrilateral).flatten()
-        quadrilateral = np.array(quadrilateral, dtype=np.uint32)
-
-        triangle = triangle.tolist()
-        quadrilateral = quadrilateral.tolist()
-        cell = change_to_triangle(4, quadrilateral, triangle)  # 用一个变量来表示面绘制信息
-        cell = np.array(cell, dtype=np.uint32)
+        cell = np.array(triangle)
 
     return vertices, cell, var
 
 
-
+# 网格读取器
 def MeshReader(path):
+
+    # 该读取器支持的网格类型 (该写法为meshio的写法)
+    supported_cells = ['triangle', 'quad', 'tetra', 'hexahedron']
+
     # 获取文件扩展名（不包含点）
     ext = os.path.splitext(path)[1].lower()[1:]
 
@@ -137,55 +131,37 @@ def MeshReader(path):
     else:
         # 使用 meshio 读取其他类型的文件
         mesh = meshio.read(path)
-        '''mesh对象的属性
-            1. points：numpy.ndarray，是一个二维数组，形状为 (n, 3)，其中 n 是顶点的数量，每个顶点有三个坐标值
-            2. cells_dict：dict，键是单元类型的字符串（例如 'triangle'、'quad' 等），值是一个包含对应单元连接信息的二维 NumPy 数组。
-                每个数组的形状为 (m, k)，其中 m 是该类型单元的数量，k 是每个单元的顶点数。例如，对于一个四边形网格，k 为 4。
-            例如：
-            cells_dict={
-                'triangle': np.array([
-                    [0, 1, 2],
-                    [0, 2, 3]
-                ]),
-                'quad': np.array([
-                    [0, 1, 2, 3]
-                ])
-            }       因此下面的循环也就是在每一个列表里面进行循环，从而记录边的信息。
-            '''
         # meshio 读取的对象有 points 和 cells_dict 属性
         points = np.array(mesh.points, dtype=np.float32)
         cells_dict = mesh.cells_dict
 
-        # 创建包含所有支持类型的 cells 字典
-        cells = {}
-        for cell_type in ['tetra', 'hexahedron', 'wedge', 'pyramid']:
-            if cell_type in cells_dict:
-                cells[cell_type] = np.array(cells_dict[cell_type], dtype=np.uint32)
+        """当前版本体网格只支持读取单一单元类型的网格"""
 
-        # 如果包含体网格单元，返回 BodyMesh 对象
-        if cells:
-            return BodyMesh(points, cells)
+        if all(item not in cells_dict for item in supported_cells):
+            print("Error: This type of mesh is not supported for display.")
+            return None
 
-        # 如果没有体网格单元，继续处理面网格
-        else:
-            # 仍然返回 FaceMesh 对象
-            triangles = []
-            quad = []
-            if 'triangle' in mesh.cells_dict:
-                triangles = mesh.cells_dict['triangle']
+        if 'tetra' in cells_dict or 'hexahedron' in cells_dict: # 处理体网格
 
-            if 'quad' in mesh.cells_dict:
-                quad = mesh.cells_dict['quad']
+            if 'tetra' in cells_dict and 'hexahedron' in cells_dict:  # 同时含有两种类型的体网格则都不支持
+                print("Error: This type of mesh is not supported for display.")
+                return None
+            elif 'tetra' in cells_dict:  # 四面体网格
+                cells = cells_dict['tetra'].astype(np.uint32)
+                return BodyMesh(points, cells, "tetrahedron")
+            elif 'hexahedron' in cells_dict:   # 六面体网格
+                cells = cells_dict['hexahedron'].astype(np.uint32)
+                return BodyMesh(points, cells, 'hexahedron')
 
-            # 这里还可以继续增加 if 语句，将更多种类的多边形都读取进来，只需对应地去扩充三角化函数即可。
+        else:  # 处理面网格
 
-            # 下面就是把不管几边形都变成三角形来绘制了。
-            triangles = np.array(triangles).flatten()
-            quad = np.array(quad).flatten()
+            if 'triangle' in cells_dict and 'quad' in cells_dict:  # 同时含有两种类型的面网格则都不支持
+                print("Error: This type of mesh is not supported for display.")
+                return None
+            elif 'triangle' in cells_dict:  # 三角形网格
+                cells = cells_dict['triangle'].astype(np.uint32)
+                return FaceMesh(points, cells, 'triangle')
+            elif 'quad' in cells_dict:   # 四边形网格
+                cells = cells_dict['quad'].astype(np.uint32)
+                return FaceMesh(points, cells, 'quadrilateral')
 
-            triangles = triangles.tolist()
-            quad = quad.tolist()
-            cell = change_to_triangle(4, quad, triangles)  # 用一个变量来表示面绘制信息
-            cell = np.array(cell, dtype=np.uint32)
-
-            return FaceMesh(points, cell, 'triangle')
