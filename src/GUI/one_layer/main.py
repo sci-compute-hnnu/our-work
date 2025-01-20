@@ -45,9 +45,6 @@ class one_layer():
         self.PB = builder.get_object("PB")
         self.PB.set_active(True)
 
-        self.information = builder.get_object("information")
-        self.information.set_active(True)
-
 
         """Edit下拉菜单"""
         '''edit--apply'''
@@ -71,7 +68,6 @@ class one_layer():
         self.default_style = builder.get_object("Default_style")
         self.simple_style = builder.get_object("Simple_style")
         self.dark_style = builder.get_object("Dark_style")
-
         self.style = Style(builder)
 
         """其他需要使用的部件"""
@@ -79,6 +75,9 @@ class one_layer():
         self.noteboox = None
         self.two_layer = None
         self.three_layer = None
+
+        self.information = builder.get_object("information")
+        self.information.set_active(True)
 
 
     # 加载其他需要使用的部件
@@ -145,7 +144,6 @@ class one_layer():
     # 第一层的open按钮(打开文件按钮)
     def open_clicked(self, button, filebutton):
         filebutton.clicked()
-
 
 
     " ---------- Mesh -----------"
