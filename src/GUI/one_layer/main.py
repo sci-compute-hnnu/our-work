@@ -151,7 +151,6 @@ class one_layer():
     " ---------- Mesh -----------"
     def open_2d_mesh_widonw(self, button):
 
-
         # 获取Mesh name 的默认名字
 
         _2DMeshWin = _2DMeshWindow()
@@ -161,6 +160,7 @@ class one_layer():
     def open_3d_mesh_widonw(self, button):
 
         _3DMeshWin = _3DMeshWindow()
+        _3DMeshWin.loadWidget(self.box1)
         _3DMeshWin.run()
 
 
