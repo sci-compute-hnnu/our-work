@@ -313,11 +313,11 @@ class view_box():
             mesh = object
 
         # 面网格的数据初始化
-        self.vertices = mesh.points
-        self.edges = mesh.edges
-        self.faces = mesh.cell
-        self.normal = mesh.normal
-        self.var = mesh.var
+        self.vertices = mesh.gl_points
+        self.edges = mesh.gl_edges
+        self.faces = mesh.gl_cells
+        self.normal = mesh.gl_normal
+        self.var = mesh.gl_var
 
         if len(self.var) != 0:
             # 取出var的最后一列
