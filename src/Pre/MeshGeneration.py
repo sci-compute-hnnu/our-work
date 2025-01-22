@@ -1,5 +1,6 @@
 import gmsh
 import pygmsh
+import numpy as np
 
 
 def _2D_generate_mesh(shape, mesh_size, algorithm):
@@ -90,47 +91,30 @@ def _3D_generate_mesh(shape, mesh_size, algorithm, mesh_type):
     gmsh.model.mesh.setSize(gmsh.model.getEntities(0), mesh_size)
     gmsh.option.setNumber("Mesh.Algorithm3D", int(algorithm))
 
-    gmsh.model.mesh.generate(int(mesh_type))
+    gmsh.model.mesh.generate(mesh_type)
     node_tags, node_coords, _ = gmsh.model.mesh.getNodes()
     element_tags, element_types, element_nodes = gmsh.model.mesh.getElements(-1, -1)
 
-    element_type_names = {
-        1: "line",
-        2: "triangle",
-        3: "quadrilateral",
-        4: "tetrahedron",
-        5: "hexahedron",
-        6: "wedge",
-        7: "pyramid",
-        8: "quadratic line",
-        9: "quadratic triangle",
-        10: "quadratic quadrilateral",
-        11: "cubic tetrahedron",
-        12: "cubic hexahedron",
-        13: "cubic wedge",
-        14: "cubic pyramid",
-        15: "linear triangle",
-        16: "linear quadrilateral",
-        17: "linear tetrahedron",
-        18: "linear hexahedron",
-        # 可以根据需要添加更多类型
-    }
-    # 获取单元数据
-    cells = {}
-    # 遍历每种元素类型
-    for i, tag in enumerate(element_tags):
-        etype = element_tags[i]  # 获取单元类型 ID
-        type_name = element_type_names.get(etype, "unknown")  # 获取类型名称
-        element_array = element_types[i]  # 获取对应的 element_type 数组
+    elementTypes, elementTags, nodeTags = gmsh.model.mesh.getElements(mesh_type, -1)
 
-        # 将类型名称和对应的 element_type 数组添加到 cells 字典
-        if type_name not in cells:
-            cells[type_name] = []
-        cells[type_name].extend(element_array.tolist())  # 将数组转换为列表并添加
+    # 整理单元数据
+    cells = []
+    for elem_node_tags in nodeTags:
+        # 将节点标签减去 1 以使索引从 0 开始
+        cells.append([tag - 1 for tag in elem_node_tags])
+
+    cells_array = np.array(cells[0])
+    n_elements = cells_array.shape[0]  # 获取总元素数量
+
+    new_shape = (len(nodeTags), n_elements // (mesh_type + 1), mesh_type + 1)  # 新形状
+    cells = cells_array.reshape(new_shape)
+
+    # 如果需要只保留二维数组
+    cells = cells.reshape(-1, mesh_type + 1)  # 将三维数组转换为二维数组
 
     gmsh.finalize()
 
-    return node_coords, element_nodes, element_tags, cells
+    return node_coords, element_nodes, cells
 
 
 
