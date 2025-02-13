@@ -3,12 +3,11 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk
 
-from Solve.BEM._3D_const_BEM_Laplace import BEM_3DCESolver
 from Utils.Connector.SolverViewBoxConn import SolverViewBoxConn
 
 class SolverWindow:
 
-    def __init__(self, glade_path, solver, box1, notebook, two_layer, three_layer):
+    def __init__(self, glade_path, box1, notebook, two_layer, three_layer):
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(glade_path)
@@ -17,12 +16,6 @@ class SolverWindow:
 
         # 关闭窗口 销毁界面
         self.window.connect("destroy", Gtk.main_quit)
-
-        # 边值条件输入框
-        self.bc_entry = self.builder.get_object("entry")
-
-        # 求解器
-        self.solver = solver
 
         # "选择网格"combobox
         self.mesh_combobox = self.builder.get_object("select_mesh")
@@ -75,6 +68,12 @@ class SolverWindow:
         adjustment2.set_step_increment(1)  # 步长
         self.freq_spin.set_digits(1) # 小数点后1位
         self.all_time_spin.set_value(30.0)  # 设置默认60.0s
+
+
+        # 连接器
+        self.Connector = SolverViewBoxConn()
+        # 选择的网格
+        self.selectedMeshClass = None
 
 
         """ 设置参数框底色 """
@@ -133,63 +132,35 @@ class SolverWindow:
         else:
             print("未选择任何网格")
 
-
-
         # 获取刷新频率
         freq = float(self.freq_spin.get_value())
         # 获取总时间
         all_time = float(self.all_time_spin.get_value())
 
 
-        """step1  先关闭窗口"""""
-        self.window.destroy()
-
-
-        """step2  来到box1中查找网格"""
-        currentMeshClass = None   # 选中的网格(meshClass)
-        should_draw = 0     # 选中的网格再box1中的绘制编号
+        """step1  来到box1中查找网格"""
+        should_draw = -1
         for index, item in enumerate(self.box1.list_store):
             value = list(item)  # 获取当前条目的值 [bool, str]
             meshName = value[1]  # 获取网格名字
 
             # 检查是否匹配
             if currentMeshName == meshName:
-                currentMeshClass = self.box1.faceMeshList[index]  # 获取当前的索引
+                self.selectedMeshClass = self.box1.faceMeshList[index]  # 获取当前的索引
                 should_draw = index
                 break
 
-
-        # 在showbox中进行绘制
-        showbox = self.notebook.showbox
-
-
-        """step3  在three_layer的两个选择框中切换相关选项"""
+        """step2  在three_layer的两个选择框中切换相关选项"""
         # 将点线面选择框中切换为 "Surface" 绘制模式
-        self.three_layer.switch_option_in_select_box(2, 'Surface', showbox)
+        self.three_layer.switch_option_in_select_box(2, 'Surface', self.notebook.showbox)
 
         # 将颜色绘制选择框设置为 "var" 模式
-        self.three_layer.switch_option_in_select_box(1, 'var', showbox)
+        self.three_layer.switch_option_in_select_box(1, 'var', self.notebook.showbox)
 
 
-        """step4  建立求解器"""
-        solver = self.solver(currentMeshClass)
+        """step3  建立渲染连接器"""
+        self.Connector.load_fit(self.notebook.showbox, should_draw,
+                                      self.two_layer.timer_entry, self.box1, freq, all_time)
 
 
-
-
-        """step5  建立渲染连接器并调用实时检测渲染更新"""
-
-        # 计时器
-        timer = self.two_layer.timer_entry
-        Connector = SolverViewBoxConn(solver, showbox, should_draw, timer, self.box1)
-
-
-        # 获取边值条件
-        g_str = self.bc_entry.get_text()
-        local_dict = {}
-        # 将字符串转化为函数
-        exec(f"def g(x): return {g_str}", globals(), local_dict)  # local_dict['g'] 函数对象
-        g = local_dict['g']
-
-        Connector.DetectorWithRealTime(freq, all_time, g)
 
