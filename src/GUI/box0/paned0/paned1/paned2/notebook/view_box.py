@@ -303,7 +303,7 @@ class view_box():
         ], dtype=np.float32)
 
     # 网格显示的初始化
-    def on_realize(self, object, projection_matrix=None):  # object 可能是box1 也可能是网格类
+    def on_realize(self, object, rotation_matrix=None, draw_step=-1):  # object 可能是box1 也可能是网格类
 
         """ 获取边面信息 """
 
@@ -347,7 +347,15 @@ class view_box():
             [0, 0, 0, 1]
         ], dtype=np.float32)
 
-        self.rotation_matrix = np.dot(self.rotation_matrix, tap_matrix).astype(np.float32)
+        if draw_step == -1:
+            self.rotation_matrix = np.dot(self.rotation_matrix, tap_matrix).astype(np.float32)
+        else:
+            if draw_step == 1:
+                self.rotation_matrix = np.dot(rotation_matrix, tap_matrix).astype(np.float32)
+            else:
+                self.rotation_matrix = rotation_matrix
+
+
 
         """ 更新透视投影矩阵 """
 
@@ -360,10 +368,7 @@ class view_box():
         aspect_ratio = glarea_width / glarea_height  # 宽高比
         near_plane = 0.5  # 近平面距离
         far_plane = 500  # 远平面距离
-        if projection_matrix is not None:
-            self.projection_matrix = projection_matrix
-        else:
-            self.projection_matrix = set_perspective_matrix(fov, aspect_ratio, near_plane, far_plane)
+        self.projection_matrix = set_perspective_matrix(fov, aspect_ratio, near_plane, far_plane)
 
         """"更新观察矩阵"""
 

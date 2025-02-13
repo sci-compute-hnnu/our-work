@@ -2,6 +2,8 @@ import numpy as np
 from scipy.sparse.linalg import LinearOperator, gmres, lgmres
 import time
 
+from Utils.Mesh.MeshClass import FaceMesh
+import meshio
 
 class BEM_3DCESolver():
 
@@ -80,7 +82,7 @@ class BEM_3DCESolver():
 
     def computeRHS(self, bdry_fun):
         self.rhs = bdry_fun(self.nodes)  # 右端向量, 即边界值
-        # print(self.rhs)
+        print(self.rhs)
         return
 
     def gmres_callback(self, density):
@@ -151,7 +153,24 @@ class BEM_3DCESolver():
         return VN
 
 
+    def Solve(self, g):
 
+        self.ComputeSingularIntegral()
+        self.computeRHS(g)
+        self.solve()
+
+if __name__ == "__main__":
+    # g = lambda x: 1 / np.sqrt((x[:, 0] - 1) ** 2 + (x[:, 1] - 1) ** 2 + (x[:, 2] - 1) ** 2)  # 内问题的边值条件
+    g = lambda x: 1 / np.sqrt(x[:, 0] ** 2 + x[:, 1] ** 2 + x[:, 2] ** 2)  # 外问题的边值条件
+
+    # 读取网格信息d
+    mesh = meshio.read('../../../data/ball_triangleMesh.off')
+    vertexs = mesh.points
+    faces = mesh.cells_dict['triangle']
+
+    facemesh1 = FaceMesh(vertexs, faces, "triangle")
+    bemsolver = BEM_3DCESolver(facemesh1)
+    bemsolver.Solve(g)
 
 
 
