@@ -65,12 +65,20 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="entry">
+              <object class="GtkComboBoxText" id="combobox_BEM">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
-                <property name="has-frame">False</property>
-                <property name="shadow-type">out</property>
-                <property name="placeholder-text" translatable="yes">请输出边值条件</property>
+                <property name="has-focus">True</property>
+                <property name="is-focus">True</property>
+                <property name="button-sensitivity">on</property>
+                <property name="has-entry">True</property>
+                <child internal-child="entry">
+                  <object class="GtkEntry" id="entry">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="has-focus">True</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="expand">True</property>
