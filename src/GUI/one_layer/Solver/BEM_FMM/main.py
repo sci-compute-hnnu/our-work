@@ -7,7 +7,7 @@ from Solve.BEM_FMM._3D_const_BEM_FMM import BEM_3DCESolver_FMM
 from GUI.one_layer.Solver.SolverWindow import SolverWindow
 
 
-class BEMSolverWindow(SolverWindow):
+class BEM_FMMSolverWindow(SolverWindow):
     def __init__(self, box1, notebook, two_layer, three_layer):
         super().__init__('../../ui/solver.glade', box1, notebook, two_layer, three_layer)
 
