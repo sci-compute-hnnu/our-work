@@ -1,4 +1,4 @@
-import CE_3D
+from Solve.BEM_FMM import CE_3D
 
 class BEM_3DCESolver_FMM():
 
