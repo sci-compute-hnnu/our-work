@@ -121,6 +121,36 @@ class _3DMeshWindow:
         if default_iter is not None:
             combo_box.set_active_iter(default_iter)
 
+    def update_mesh_type_options(self, combo_box, options, default_option):
+        """
+        更新 ComboBox 的选项及默认选项
+        :param combo_box: 要更新的 ComboBox 控件
+        :param options: 选项列表
+        :param default_option: 默认选中的选项
+        """
+        # 清除现有模型
+        combo_box.clear()
+        liststore = Gtk.ListStore(str)
+        for option in options:
+            liststore.append([option])
+
+        # 设置 ComboBox 的模型
+        combo_box.set_model(liststore)
+
+        # 创建 CellRendererText 对象并添加到 ComboBox
+        renderer = Gtk.CellRendererText()
+        combo_box.pack_start(renderer, True)
+        combo_box.add_attribute(renderer, "text", 0)
+
+        # 设置默认选项
+        default_iter = liststore.get_iter_first()
+        while default_iter is not None:
+            if liststore.get_value(default_iter, 0) == default_option:
+                break
+            default_iter = liststore.iter_next(default_iter)
+        if default_iter is not None:
+            combo_box.set_active_iter(default_iter)
+
     def update_mesh_name(self, shape_type):
         """确认Mesh name框中的默认名字字符串"""
         existing_names = [row[1] for row in self.box1.list_store]
@@ -142,7 +172,7 @@ class _3DMeshWindow:
             "9：R-tree",
             "10:HXT"
         ], "1：MeshAdapt")
-        self.update_algorithm_options(self.mesh_type, [
+        self.update_mesh_type_options(self.mesh_type, [
             "2:Surface",
             "3:Volume"
         ], "Volume")
@@ -162,7 +192,7 @@ class _3DMeshWindow:
             "10:HXT"
         ], "1：MeshAdapt")
 
-        self.update_algorithm_options(self.mesh_type, [
+        self.update_mesh_type_options(self.mesh_type, [
             "2:Surface",
             "3:Volume"
         ], "Volume")
@@ -181,7 +211,7 @@ class _3DMeshWindow:
             "9：R-tree",
             "10:HXT"
         ], "1：MeshAdapt")
-        self.update_algorithm_options(self.mesh_type, [
+        self.update_mesh_type_options(self.mesh_type, [
             "2:Surface",
             "3:Volume"
         ], "Volume")
@@ -195,11 +225,13 @@ class _3DMeshWindow:
         """step1. 获取当前界面的绘制信息"""
         current_page = self.para_stack.get_visible_child_name()
         model = self.algorithm.get_model()
+        model_2 = self.mesh_type.get_model()
 
         algorithm_selected = self.algorithm.get_active_iter()
         algorithm = model.get_value(algorithm_selected, 0).split("：")[0]
         type_selected = self.mesh_type.get_active_iter()
-        type_value = model.get_value(algorithm_selected, 0).split("：")[0]
+        type_value = model_2.get_value(type_selected, 0).split(":")[0]
+        type_value = int(type_value)
         size_value = float(self.size.get_text())
 
         if current_page == "Box":
@@ -208,6 +240,7 @@ class _3DMeshWindow:
                 self.cu_dx_entry, self.cu_dy_entry, self.cu_dz_entry
             ]
             shape = ["box"] + [float(entry.get_text()) for entry in entries]
+
         elif current_page == "Sphere":
             entries = [
                 self.sphe_x_entry, self.sphe_y_entry, self.sphe_z_entry,
@@ -224,7 +257,7 @@ class _3DMeshWindow:
 
         """step2.调用gmsh算法 生成网格"""
         if shape:
-            node_coords, element_nodes, element_tags, cells = (_3D_generate_mesh(shape, size_value, algorithm, type_value))
+            node_coords, element_nodes, cells = (_3D_generate_mesh(shape, size_value, algorithm, type_value))
 
             # 将节点坐标转换为 NumPy 数组
             points = np.array(node_coords).reshape(-1, 3)
@@ -238,8 +271,9 @@ class _3DMeshWindow:
             info = f"Mesh generated with:\n {num_points} points \n {total_elements} cells\n Algorithm: \n {algorithm}"
             self.box1.info_print(info)
 
+
             """step4. 构建meshClass并载入box1"""
-            meshWithGL = BodyMesh(points, cells)
+            meshWithGL = BodyMesh(points, cells, 'tetrahedron')
 
             self.box1.load_Mesh(meshWithGL, name=mesh_name)
 
