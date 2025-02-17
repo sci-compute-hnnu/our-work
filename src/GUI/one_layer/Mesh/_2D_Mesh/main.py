@@ -2,7 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from Pre.MeshGeneration import _2D_generate_mesh
+from Pre.MeshGeneration import _2D_generate_mesh, _2D_generate_stru_mesh
 from Utils.Mesh.MeshClass import FaceMesh
 
 class _2DMeshWindow:
@@ -35,6 +35,11 @@ class _2DMeshWindow:
         self.algorithm = self.builder.get_object("algorithm")
         self.size = self.builder.get_object("size")
         self.mesh_name_entry = self.builder.get_object("mesh_name")
+        self.structured_mesh = self.builder.get_object("structured_mesh")
+        self.direction = self.builder.get_object("direction")
+        self.selection = self.builder.get_object("selection")
+        self.selection.hide()
+
 
         # 动态设置参数的堆叠容器
         self.para = self.builder.get_object("para")
@@ -64,6 +69,7 @@ class _2DMeshWindow:
         self.other_button.connect("clicked", self.on_button_other_clicked)
         self.confirm_button.connect("clicked", self.on_confirm_clicked)
         self.cancel_button.connect("clicked", self.on_cancel_clicked)
+        self.structured_mesh.connect("toggled", self.on_structured_mesh_toggled)
 
         # 将 Stack 添加到 para 容器中
         self.para.pack_start(self.para_stack, True, True, 0)
@@ -72,7 +78,9 @@ class _2DMeshWindow:
         self.para_stack.set_visible_child_name("empty")
 
         # 隐藏所有参数输入框
+        self.selection.hide()
         self.hide_all_parameter_inputs()
+
 
         # box1
         self.box1 = None
@@ -87,8 +95,21 @@ class _2DMeshWindow:
         for widget in [self.page_cir, self.page_rec, self.page_other]:
             widget.hide()
 
+    # 检测是否生成结构网格
+    def on_structured_mesh_toggled(self, button):
+        if button.get_active():
+            # 如果勾选，显示Direction网格
+            self.selection.show()
+            self.update_options(self.direction, [
+                "Left",
+                "Right"
+            ], "Left")
+        else:
+            # 如果未勾选，隐藏Direction网格
+            self.selection.hide()
+
     # 更新选项
-    def update_algorithm_options(self, combo_box, options, default_option):
+    def update_options(self, combo_box, options, default_option):
         combo_box.clear()
         liststore = Gtk.ListStore(str)
         for option in options:
@@ -119,7 +140,7 @@ class _2DMeshWindow:
         self.hide_all_parameter_inputs()
         self.page_cir.show()
         self.para_stack.set_visible_child_name("Circle")
-        self.update_algorithm_options(self.algorithm, [
+        self.update_options(self.algorithm, [
             "1：MeshAdapt",
             "2：Automatic",
             "3：Initial mesh only",
@@ -136,7 +157,7 @@ class _2DMeshWindow:
         self.hide_all_parameter_inputs()
         self.page_rec.show()
         self.para_stack.set_visible_child_name("Rectangle")
-        self.update_algorithm_options(self.algorithm, [
+        self.update_options(self.algorithm, [
             "1：MeshAdapt",
             "2：Automatic",
             "3：Initial mesh only",
@@ -153,7 +174,7 @@ class _2DMeshWindow:
         self.hide_all_parameter_inputs()
         self.page_other.show()
         self.para_stack.set_visible_child_name("other")
-        self.update_algorithm_options(self.algorithm, [
+        self.update_options(self.algorithm, [
             "1：MeshAdapt",
             "2：Automatic",
             "3：Initial mesh only",
@@ -182,6 +203,11 @@ class _2DMeshWindow:
         algorithmcontent = model.get_value(algorithm_selected, 0).split("：")[1]
         size_value = float(self.size.get_text())
 
+        if self.structured_mesh.get_active():
+            direction_selected = str(self.direction.get_active_iter())
+        else:
+            direction_selected = ''
+
         if current_page == "Circle":
             entries = [
                 self.cir_x_entry, self.cir_y_entry, self.cir_z_entry,
@@ -202,8 +228,10 @@ class _2DMeshWindow:
 
         """step2. 调用gmsh算法 生成网格"""
         if shape:
-            mesh = _2D_generate_mesh(shape, size_value, algorithm)
-
+            if direction_selected == '' :
+                mesh = _2D_generate_mesh(shape, size_value, algorithm, direction_selected)
+            else:
+                mesh = _2D_generate_stru_mesh(shape, size_value, direction_selected)
 
             """step3. 设置information框输出信息"""
             elementType = 'triangle'
