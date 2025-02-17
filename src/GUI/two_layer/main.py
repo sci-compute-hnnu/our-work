@@ -1,9 +1,14 @@
+import datetime
 import os
 from enum import Enum
+
+import cairo
 import gi
+import numpy as np
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf
-
+from OpenGL import GL
 
 
 # 背景颜色的枚举
@@ -42,12 +47,18 @@ class two_layer():
         self.black = builder.get_object("black")
         self.gradient = builder.get_object("gradient")
 
+        # 截图按钮
+        self.camera = builder.get_object("camera")
+
         # 背景颜色的枚举
         self.back_color = back_color
 
         # 计时器
         self.timer = builder.get_object('timer')
         self.timer_entry = self.timer.get_child()
+
+
+
 
 
 
@@ -105,3 +116,74 @@ class two_layer():
 
         showbox.glarea.queue_draw()
 
+
+
+    # 对glarea进行截图
+    def on_screenshot_button_clicked(self, showbox,box1, widget):
+        # 获取图像内容并保存为 PNG
+        screenshot = self.take_screenshot(showbox,box1)
+
+        # 获取默认的文件名
+        default_filename = "screenshot.png"
+
+        # 自定义命名（可以通过对话框或其他方式获取用户输入）
+        custom_filename = self.get_custom_filename(default_filename)
+
+        # 保存为 PNG
+        screenshot.write_to_png(custom_filename)
+        print(f"Screenshot saved as {custom_filename}")
+
+    def take_screenshot(self, notebook, box1):
+        # 获取当前页面的控件
+        current_page = notebook.get_nth_page(notebook.get_current_page())  # 获取当前页
+        children = current_page.get_children()  # 获取该页面的所有子控件
+
+        eventbox = children[0]  # 获取第一个子控件 为eventbox
+
+        # 获取 EventBox 中的子控件
+        child_widget = eventbox.get_child() # 为box
+        child = child_widget.get_children()[2] # 为glarea
+        # 获取子控件的分配区域（即横纵坐标）
+        allocation = child.get_allocation()
+        width, height = allocation.width, allocation.height
+
+        # 获取box1的宽
+        box1_width = box1.get_allocated_width()
+        x_start = box1_width + 9
+        y_start = 24
+
+        # 获取 OpenGL 渲染内容并保存为 cairo 表面
+        screenshot_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+        cairo_context = cairo.Context(screenshot_surface)
+
+        # 从 OpenGL 渲染读取内容并进行截图
+        GL.glReadBuffer(GL.GL_FRONT)
+        pixels = np.zeros((height, width, 4), dtype=np.uint8)
+        GL.glReadPixels(x_start, y_start, width, height, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, pixels)
+
+        # 将 OpenGL 渲染结果转换为 Cairo 图像
+        for y in range(height):
+            for x in range(width):
+                r, g, b, a = pixels[y, x]
+                cairo_context.set_source_rgba(r / 255.0, g / 255.0, b / 255.0, a / 255.0)
+                cairo_context.rectangle(x, height - 1 - y, 1, 1)
+                cairo_context.fill()
+
+        return screenshot_surface
+
+
+    def get_custom_filename(self, default_filename):
+        # 指定相对路径的保存文件夹
+        save_dir = os.path.join(os.getcwd(), "..", "..", "results", "photo")
+
+        # 转换为绝对路径，确保跨平台兼容
+        save_dir = os.path.abspath(save_dir)
+
+        # 确保目录存在
+        os.makedirs(save_dir, exist_ok=True)
+
+        # 获取当前时间戳作为默认文件名的一部分
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        custom_filename = f"screenshot_{timestamp}.png"
+
+        return os.path.join(save_dir, custom_filename)
