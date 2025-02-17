@@ -76,6 +76,8 @@ class SolverViewBoxConn:
         rtol = 1e-08
         atol = 1e-08
 
+        self.old_rotation_matrix = self.showbox.rotation_matrix.copy()
+
         if not (np.allclose(self.old_point_var, self.solver.point_var, rtol=rtol, atol=atol)):
             self.draw_step += 1
 
@@ -87,10 +89,6 @@ class SolverViewBoxConn:
             self.showbox.should_draw = self.should_draw
             self.showbox.glarea.queue_draw()
             self.old_point_var = self.solver.point_var.copy()
-
-
-        self.old_rotation_matrix = self.showbox.rotation_matrix
-        # print(self.old_projection_matrix)
 
         return True
 
