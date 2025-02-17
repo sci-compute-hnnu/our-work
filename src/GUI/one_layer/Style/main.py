@@ -9,7 +9,7 @@ class Style():
         # 获取图标对象
         self.icons = {name: builder.get_object(name) for name in [
             "open_image", "download_image", "save_image", "reset_image", "undo_image",
-            "redo_image", "color_image", "left1_image", "left2_image", "left3_image",
+            "redo_image", "color_image", "left1_image", "left2_image", "left3_image", "begin_stop_image",
             "right1_image", "right2_image", "right3_image", "circle_image", "camera_image",
             "no_camera_image", "legend_image", "gmsh_image", "zoomout_image", "zoomin_image",
             "+x_image", "-x_image", "+y_image", "-y_image", "+z_image", "-z_image",
@@ -25,6 +25,7 @@ class Style():
                 "undo_image": "../../images/MainPage/Simple/undo.png", "redo_image": "../../images/MainPage/Simple/redo.png",
                 "color_image": "../../images/MainPage/Simple/color.png", "left1_image": "../../images/MainPage/Simple/left1.png",
                 "left2_image": "../../images/MainPage/Simple/left2.png", "left3_image": "../../images/MainPage/Simple/left3.png",
+                "begin_stop_image": "../../images/MainPage/Simple/begin_stop.png",
                 "right1_image": "../../images/MainPage/Simple/right1.png", "right2_image": "../../images/MainPage/Simple/right2.png",
                 "right3_image": "../../images/MainPage/Simple/right3.png", "circle_image": "../../images/MainPage/Simple/circle.png",
                 "camera_image": "../../images/MainPage/Simple/camera.png", "no_camera_image": "../../images/MainPage/Simple/no_camera.png",
@@ -43,6 +44,7 @@ class Style():
                 "undo_image": "../../images/MainPage/Dark/undo.png", "redo_image": "../../images/MainPage/Dark/redo.png",
                 "color_image": "../../images/MainPage/Dark/color.png", "left1_image": "../../images/MainPage/Dark/left1.png",
                 "left2_image": "../../images/MainPage/Dark/left2.png", "left3_image": "../../images/MainPage/Dark/left3.png",
+                "begin_stop_image": "../../images/MainPage/Dark/begin_stop.png",
                 "right1_image": "../../images/MainPage/Dark/right1.png", "right2_image": "../../images/MainPage/Dark/right2.png",
                 "right3_image": "../../images/MainPage/Dark/right3.png", "circle_image": "../../images/MainPage/Dark/circle.png",
                 "camera_image": "../../images/MainPage/Dark/camera.png", "no_camera_image": "../../images/MainPage/Dark/no_camera.png",
@@ -69,7 +71,7 @@ class Style():
             "save_image": "document-save-as", "reset_image": "view-refresh",
             "undo_image": "edit-undo", "redo_image": "edit-redo", "color_image": "gtk-select-color",
             "left1_image": "media-skip-backward", "left2_image": "media-seek-backward",
-            "left3_image": "pan-start-symbolic", "right1_image": "media-skip-backward-symbolic-rtl",
+            "left3_image": "pan-start-symbolic", "begin_stop_image": "media-playback-stop","right1_image": "media-skip-backward-symbolic-rtl",
             "right2_image": "media-seek-forward", "right3_image": "pan-end-symbolic",
             "circle_image": "media-playlist-repeat", "camera_image": "camera-photo-symbolic",
             "no_camera_image": "camera-disabled-symbolic", "legend_image": "image-x-generic",

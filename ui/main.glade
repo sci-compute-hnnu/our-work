@@ -779,7 +779,7 @@
                 </child>
               </object>
               <packing>
-                <property name="x">650</property>
+                <property name="x">715</property>
               </packing>
             </child>
             <child>
@@ -801,7 +801,7 @@
                 </child>
               </object>
               <packing>
-                <property name="x">715</property>
+                <property name="x">780</property>
               </packing>
             </child>
             <child>
@@ -823,7 +823,7 @@
                 </child>
               </object>
               <packing>
-                <property name="x">780</property>
+                <property name="x">910</property>
               </packing>
             </child>
             <child>
@@ -838,7 +838,7 @@
                 </attributes>
               </object>
               <packing>
-                <property name="x">910</property>
+                <property name="x">975</property>
               </packing>
             </child>
             <child>
@@ -855,7 +855,7 @@
                 </child>
               </object>
               <packing>
-                <property name="x">975</property>
+                <property name="x">1040</property>
               </packing>
             </child>
             <child>
@@ -877,7 +877,7 @@
                 </child>
               </object>
               <packing>
-                <property name="x">1175</property>
+                <property name="x">1240</property>
               </packing>
             </child>
             <child>
@@ -899,7 +899,7 @@
                 </child>
               </object>
               <packing>
-                <property name="x">1240</property>
+                <property name="x">1305</property>
               </packing>
             </child>
             <child>
@@ -946,6 +946,28 @@
               </object>
               <packing>
                 <property name="x">845</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="width-request">65</property>
+                <property name="height-request">50</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="relief">none</property>
+                <child>
+                  <object class="GtkImage" id="begin_stop_image">
+                    <property name="width-request">50</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="pixel-size">25</property>
+                    <property name="icon-name">media-playback-stop</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="x">650</property>
               </packing>
             </child>
           </object>
@@ -1615,6 +1637,51 @@
                                         <property name="expand">True</property>
                                         <property name="fill">True</property>
                                         <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkBox">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <child>
+                                          <object class="GtkButton" id="info_clear">
+                                            <property name="label" translatable="yes">clear</property>
+                                            <property name="width-request">75</property>
+                                            <property name="height-request">40</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <property name="relief">half</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="pack-type">end</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <placeholder/>
+                                        </child>
+                                        <child>
+                                          <placeholder/>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkSeparator">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
                                       </packing>
                                     </child>
                                   </object>
