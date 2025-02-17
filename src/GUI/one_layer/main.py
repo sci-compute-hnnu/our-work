@@ -6,6 +6,7 @@ from gi.repository import Gtk, Gdk, GdkPixbuf
 from GUI.one_layer.Mesh._2D_Mesh.main import _2DMeshWindow
 from GUI.one_layer.Mesh._3D_Mesh.main import _3DMeshWindow
 from GUI.one_layer.Solver.BEM.main import BEMSolverWindow
+from GUI.one_layer.Solver.BEM_FMM.main import BEM_FMMSolverWindow
 from GUI.one_layer.Style.main import Style
 
 class one_layer():
@@ -63,6 +64,7 @@ class one_layer():
 
         """Solver下拉菜单"""
         self.BEM = builder.get_object('BEM')
+        self.BEM_FMM = builder.get_object('BEM_FMM')
 
         """Style下拉菜单"""
         self.default_style = builder.get_object("Default_style")
@@ -166,6 +168,11 @@ class one_layer():
     def open_BEM_solver_window(self, button):
 
         BEMSolverWin = BEMSolverWindow(self.box1, self.noteboox, self.two_layer, self.three_layer)
+        BEMSolverWin.run()
+
+    def open_BEM_FMM_solver_window(self, button):
+
+        BEMSolverWin = BEM_FMMSolverWindow(self.box1, self.noteboox, self.two_layer, self.three_layer)
         BEMSolverWin.run()
 
 

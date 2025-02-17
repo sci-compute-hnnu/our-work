@@ -231,6 +231,14 @@
         <property name="use-underline">True</property>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem" id="BEM_FMM">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">BEM_FMM</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
   </object>
   <object class="GtkMenu" id="sub_sources">
     <property name="visible">True</property>
