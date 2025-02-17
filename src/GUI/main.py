@@ -81,7 +81,8 @@ class UI():
         # back_color of enum
         self.back_color = self.two_layer.back_color
 
-
+        # camera
+        self.camera = self.two_layer.camera
 
 
 
@@ -257,6 +258,10 @@ class UI():
                                                                                       self.back_color.light_gray))
         self.gradient.connect("activate", lambda btn: self.two_layer.set_back_color(btn, self.get_current_showbox(),
                                                                                     self.back_color.gradient))
+        # 连接截图
+        self.camera.connect("clicked",
+                            lambda btn: self.two_layer.on_screenshot_button_clicked(self.note_book, self.box1.box1,
+                                                                                    btn))
 
 
         """--------------three_layerd连接函数--------------"""
