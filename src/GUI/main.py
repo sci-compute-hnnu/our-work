@@ -49,7 +49,6 @@ class UI():
 
         """Solver的下拉列表"""
         self.BEM = self.one_layer.BEM
-        self.BEM_FMM = self.one_layer.BEM_FMM
 
         """Style的下拉列表"""
         self.default_style = self.one_layer.default_style
@@ -232,7 +231,6 @@ class UI():
 
         # 第一层的Solver按钮
         self.BEM.connect("activate", self.one_layer.open_BEM_solver_window)
-        self.BEM_FMM.connect("activate", self.one_layer.open_BEM_FMM_solver_window)
 
         self.default_style.connect("activate", self.one_layer.change_style)
         self.simple_style.connect("activate", self.one_layer.change_style)
