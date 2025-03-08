@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.26)
+project(CXXplugin)
+
+set(CMAKE_CXX_STANDARD 17)
+
+# 添加外部库
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/mesh_structure)
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/pybind11)
+
+# 添加子模块
+add_subdirectory(MeshCXXCompiler)  # 网格读取器

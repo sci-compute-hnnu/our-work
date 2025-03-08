@@ -168,7 +168,6 @@ class one_layer():
         BEMSolverWin = BEMSolverWindow(self.box1, self.noteboox, self.two_layer, self.three_layer)
         BEMSolverWin.run()
 
-
     " ----------Style---------- "
     def change_style(self, button):
         label = button.get_label()
