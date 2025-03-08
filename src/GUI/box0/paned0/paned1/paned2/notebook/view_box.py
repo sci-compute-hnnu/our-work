@@ -350,11 +350,7 @@ class view_box():
         if draw_step == -1:
             self.rotation_matrix = np.dot(self.rotation_matrix, tap_matrix).astype(np.float32)
         else:
-            if draw_step == 1:
-                self.rotation_matrix = np.dot(rotation_matrix, tap_matrix).astype(np.float32)
-            else:
-                self.rotation_matrix = rotation_matrix
-
+            self.rotation_matrix = rotation_matrix.astype(np.float32)
 
 
         """ 更新透视投影矩阵 """
