@@ -10,60 +10,13 @@ class three_layter():
 
         ''' 线面点选择框 '''
 
-        self.select_box = builder.get_object("select_box")
-        # 创建一个ListStore对象
-        self.liststore = Gtk.ListStore(str)
-        # 添加各个选项
-        self.liststore.append(["Points"])
-        self.liststore.append(["Lines"])
-        self.liststore.append(['Surface With Edges'])
-        self.liststore.append(["Surface"])
-        self.liststore.append(['Gmsh style'])
-
-        # 将ListStore对象设置为ComboBox的模型
-        self.select_box.set_model(self.liststore)
-        # 创建一个CellRendererText对象
-        renderer = Gtk.CellRendererText()
-        # 将CellRendererText对象添加到ComboBox中的第一个列
-        # 显示列表
-        self.select_box.pack_start(renderer, True)
-        self.select_box.add_attribute(renderer, "text", 0)
-
-        # 获取Surface选项的迭代器
-        surface_iter = self.liststore.get_iter_first()
-        while surface_iter is not None:
-            if self.liststore.get_value(surface_iter, 0) == "Surface":
-                break
-            surface_iter = self.liststore.iter_next(surface_iter)
-        # 将Surface选项设置为默认显示选项
-        self.select_box.set_active_iter(surface_iter)
+        self.select_type_box = builder.get_object("select_box")
+        self.type_list = ["Points", "Lines", "Surface With Edges", "Surface", "Gmsh style"]
+        self.setup_combobox(self.select_type_box, self.type_list, 'Surface')
 
 
         ''' 颜色绘制选择框 '''
-        self.select_box1 = builder.get_object("select_box1")
-        # 创建一个ListStore对象
-        self.liststore1 = Gtk.ListStore(str)
-        # 添加各个选项
-        self.liststore1.append(["Solid Color"])
-        self.liststore1.append(["var"])
-        # 将ListStore对象设置为ComboBox的模型
-        self.select_box1.set_model(self.liststore1)
-        # 创建一个CellRendererText对象
-        renderer1 = Gtk.CellRendererText()
-        # 将CellRendererText对象添加到ComboBox中的第一个列
-        # 显示列表
-        self.select_box1.pack_start(renderer1, True)
-        self.select_box1.add_attribute(renderer1, "text", 0)
-
-        # 获取Surface选项的迭代器
-        surface_iter = self.liststore1.get_iter_first()
-        while surface_iter is not None:
-            if self.liststore1.get_value(surface_iter, 0) == "Solid Color":
-                break
-            surface_iter = self.liststore1.iter_next(surface_iter)
-        # 将Surface选项设置为默认显示选项
-        self.select_box1.set_active_iter(surface_iter)
-
+        self.select_var_box = builder.get_object("select_box1")
 
         """放大放小按钮"""
 
@@ -91,7 +44,9 @@ class three_layter():
 
     # 重置draw的状态
     def reset_draw_states(self, showbox):
-        showbox.edge_draw = showbox.face_draw = showbox.points_draw = showbox.var_draw = False
+
+        glarea = showbox.glareaClass
+        glarea.edge_draw = glarea.face_draw = glarea.points_draw = glarea.var_draw = False
 
 
     # 选择在选项框中切换选项
@@ -102,11 +57,12 @@ class three_layter():
         select_box = None
 
         if select_box_num == 1:  # 颜色选择框
-            liststore = self.liststore1
-            select_box = self.select_box1
+            select_box = self.select_var_box
+
         elif select_box_num == 2:   # 点线面选择框
-            liststore = self.liststore
-            select_box = self.select_box
+            select_box = self.select_type_box
+
+        liststore = select_box.get_model()
 
         # 切换至所选选项
         for index, row in enumerate(liststore):
@@ -120,83 +76,131 @@ class three_layter():
             self.select_option_with_face_or_edge(widget=None, showbox=showbox)  # 调用相关函数
 
 
+    # 给select_box设置新的选项
+    def setup_combobox(self, select_box, options=[' '], default_option=' '):
+        """
+        初始化一个 Gtk.ComboBox，添加渲染器，并设置默认选项
+
+        :param select_type_box: Gtk.ComboBox 实例
+        :param options: 可选项列表
+        :param default_option: 默认选项"
+        """
+
+        # 创建 ListStore 对象
+        liststore = Gtk.ListStore(str)
+
+        # 添加选项
+        for option in options:
+            liststore.append([option])
+
+        # 设置 ListStore 为 ComboBox 的模型
+        select_box.set_model(liststore)
+
+        # 创建渲染器并添加到 ComboBox
+        if not select_box.get_cells():  # 避免重复添加渲染器
+            renderer = Gtk.CellRendererText()
+            select_box.pack_start(renderer, True)
+            select_box.add_attribute(renderer, "text", 0)
+
+        # 获取默认选项的迭代器并设置为默认选项
+        default_iter = liststore.get_iter_first()
+        while default_iter is not None:
+            if liststore.get_value(default_iter, 0) == default_option:
+                select_box.set_active_iter(default_iter)
+                break
+            default_iter = liststore.iter_next(default_iter)
+        # 设置按钮可不可用
+        if default_option == ' ':
+            self.disable_button(select_box)
+        else:
+            self.enable_button(select_box)
+
+
+
     # 是否绘制 点 线 面
     def select_option_with_face_or_edge(self, widget, showbox):
         # 获取选中项的迭代器
-        active_iter = self.select_box.get_active_iter()
+        active_iter = self.select_type_box.get_active_iter()
 
         if active_iter is not None:
             # 获取选中项的值
-            model = self.select_box.get_model()
+            model = self.select_type_box.get_model()
             selected_value = model.get_value(active_iter, 0)
+
+            glarea = showbox.glareaClass
 
             # 根据不同的选项显示对应的元素
             if selected_value == "Lines":
                 self.reset_draw_states(showbox)  # 重置
 
-                showbox.edge_draw = True
+                glarea.edge_draw = True
 
             elif selected_value == "Surface":
                 self.reset_draw_states(showbox)   # 重置
 
-                showbox.face_draw = True
+                glarea.face_draw = True
 
             elif selected_value == "Points":
                 self.reset_draw_states(showbox)   # 重置
 
-                showbox.points_draw = True
+                glarea.points_draw = True
 
             elif selected_value == 'Surface With Edges':
                 self.reset_draw_states(showbox)   # 重置
 
-                showbox.edge_draw = True
-                showbox.face_draw = True
+                glarea.edge_draw = True
+                glarea.face_draw = True
 
             elif selected_value == 'Gmsh style':
 
                 self.reset_draw_states(showbox)  # 重置
-                showbox.gmsh_draw = True
+                glarea.gmsh_draw = True
 
-            showbox.glarea.queue_draw()  # 绘制更新
-
+            glarea.glarea.queue_draw()  # 绘制更新
 
 
     # 是否绘制 颜色
     def select_option_with_color(self, widget, showbox):
+
         # 获取选中项的迭代
-        active_iter = self.select_box1.get_active_iter()
+        active_iter = self.select_var_box.get_active_iter()
 
         if active_iter is not None:
             # 获取选中项的值
-            model = self.select_box1.get_model()
+            model = self.select_var_box.get_model()
             selected_value = model.get_value(active_iter, 0)
+            glarea = showbox.glareaClass
 
             # 根据不同的选项显示对应的元素
-            if selected_value == "Solid Color":
+            if selected_value == "Neutral Mode":
                 self.reset_draw_states(showbox)  # 重置
-                showbox.face_draw = True
+                glarea.face_draw = True
 
-            elif selected_value == "var":
+            # 当点击color_opt后 记得更新viewbox(showbox)的color_opt
+            else:
+
                 self.reset_draw_states(showbox)   # 重置
+                showbox.color_opt = selected_value
+                glarea.var_draw = True
 
-                showbox.var_draw = True
-
-
-            showbox.glarea.queue_draw()  # 绘制更新
+            showbox.on_realize()
+            glarea.glarea.queue_draw()
 
 
     # 放大或缩小按钮
     def restore_original_state(self, button, showbox, func):
 
-        if func == 1:  # 执行放大
-            showbox.scale = 1 + showbox.zoom_sensitivity
-        elif func == 2:   # 执行缩小
-            showbox.scale = 1 - showbox.zoom_sensitivity
+        glarea = showbox.glareaClass
 
-        s = showbox.scale
+        if func == 1:  # 执行放大
+            glarea.scale = 1 + glarea.zoom_sensitivity
+        elif func == 2:   # 执行缩小
+            glarea.scale = 1 - glarea.zoom_sensitivity
+
+        s = glarea.scale
 
         # 更新size
-        showbox.size *= s
+        glarea.size *= s
 
         # 创建一个缩放矩阵
         scale_matrix = np.array([
@@ -205,76 +209,81 @@ class three_layter():
             [0, 0, s, 0],
             [0, 0, 0, 1]
         ], dtype=np.float32)
-        showbox.rotation_matrix = np.dot(showbox.rotation_matrix, scale_matrix).astype(np.float32)
+        glarea.rotation_matrix = np.dot(glarea.rotation_matrix, scale_matrix).astype(np.float32)
 
         # 更新渲染
-        showbox.glarea.queue_draw()
+        glarea.glarea.queue_draw()
 
 
 
     # 旋转按钮
     def set_view_to_XYZ(self, button, showbox, func):
 
-        showbox.rotation_matrix = np.array([
-            [showbox.size, 0, 0, 0],
-            [0, showbox.size, 0, 0],
-            [0, 0, showbox.size, 0],
+        glarea = showbox.glareaClass
+
+        glarea.rotation_matrix = np.array([
+            [glarea.size, 0, 0, 0],
+            [0, glarea.size, 0, 0],
+            [0, 0, glarea.size, 0],
             [0, 0, 0, 1]
         ], dtype=np.float32)
 
         if func == 1:
-            showbox.angle_x = 3 * np.pi / 2
-            showbox.angle_y = np.pi
-            showbox.update_rotation_matrix()
-            showbox.angle_x = 0
-            showbox.angle_y = np.pi / 2
+            glarea.angle_x = 3 * np.pi / 2
+            glarea.angle_y = np.pi
+            glarea.update_rotation_matrix()
+            glarea.angle_x = 0
+            glarea.angle_y = np.pi / 2
         elif func == 2:
-            showbox.angle_x = 1 * np.pi / 2
-            showbox.angle_y = -np.pi
-            showbox.update_rotation_matrix()
-            showbox.angle_x = np.pi
-            showbox.angle_y = np.pi / 2
+            glarea.angle_x = 1 * np.pi / 2
+            glarea.angle_y = -np.pi
+            glarea.update_rotation_matrix()
+            glarea.angle_x = np.pi
+            glarea.angle_y = np.pi / 2
         elif func == 3:
-            showbox.angle_x = 3 * np.pi/2
-            showbox.angle_y = np.pi
+            glarea.angle_x = 3 * np.pi/2
+            glarea.angle_y = np.pi
         elif func == 4:
-            showbox.angle_x = np.pi/2
-            showbox.angle_y = 0
+            glarea.angle_x = np.pi/2
+            glarea.angle_y = 0
         elif func == 5:
-            showbox.angle_x = 0
-            showbox.angle_y = 0
+            glarea.angle_x = 0
+            glarea.angle_y = 0
         elif func == 6:
-            showbox.angle_x = 0
-            showbox.angle_y = np.pi
+            glarea.angle_x = 0
+            glarea.angle_y = np.pi
         elif func == 7:
-            showbox.angle_x = 0
-            showbox.angle_y = np.pi
-            showbox.update_rotation_matrix()
-            showbox.angle_x = np.pi / 4
-            showbox.angle_y = - np.pi / 4
+            glarea.angle_x = 0
+            glarea.angle_y = np.pi
+            glarea.update_rotation_matrix()
+            glarea.angle_x = np.pi / 4
+            glarea.angle_y = - np.pi / 4
 
         # 更新旋转矩阵
-        showbox.update_rotation_matrix()
-        showbox.glarea.queue_draw()
+        glarea.update_rotation_matrix()
+        glarea.glarea.queue_draw()
 
 
     # 顺时针逆时针旋转90度
     def rotation_90(self, button, showbox, func):
+
+        glarea = showbox.glareaClass
+
         if func == 1:
-            showbox.angle_x = np.pi / 2
-            showbox.angle_y = np.pi / 2
-            showbox.update_rotation_matrix()
-            showbox.angle_x = -np.pi
-            showbox.angle_y = np.pi / 2
+            glarea.angle_x = np.pi / 2
+            glarea.angle_y = np.pi / 2
+            glarea.update_rotation_matrix()
+            glarea.angle_x = -np.pi
+            glarea.angle_y = np.pi / 2
         elif func == 2:
-            showbox.angle_x = - np.pi / 2
-            showbox.angle_y = np.pi / 2
-            showbox.update_rotation_matrix()
-            showbox.angle_x = -np.pi
-            showbox.angle_y = np.pi / 2
+            glarea.angle_x = - np.pi / 2
+            glarea.angle_y = np.pi / 2
+            glarea.update_rotation_matrix()
+            glarea.angle_x = -np.pi
+            glarea.angle_y = np.pi / 2
         # 更新旋转矩阵
-        showbox.update_rotation_matrix()
-        showbox.glarea.queue_draw()
+        glarea.update_rotation_matrix()
+        glarea.glarea.queue_draw()
 
 
     # 颜色选择
@@ -282,15 +291,17 @@ class three_layter():
         dialog = Gtk.ColorChooserDialog(title="Select  Color", parent=None)
         response = dialog.run()
 
+        glarea = showbox.glareaClass
+
         if response == Gtk.ResponseType.OK:
             color = dialog.get_rgba()
             # Convert color channel values to the appropriate range [0, 1]
-            showbox.face_color[0] = color.red
-            showbox.face_color[1] = color.green
-            showbox.face_color[2] = color.blue
-            showbox.face_color[3] = color.alpha
+            glarea.face_color[0] = color.red
+            glarea.face_color[1] = color.green
+            glarea.face_color[2] = color.blue
+            glarea.face_color[3] = color.alpha
 
-            showbox.glarea.queue_draw()
+            glarea.glarea.queue_draw()
 
         dialog.destroy()
 
@@ -322,7 +333,7 @@ class three_layter():
         self.disable_button(self.counter_button)
         self.disable_button(self.clockwise_button)
 
-        self.disable_button(self.select_box)
+        self.disable_button(self.select_type_box)
 
     # 恢复第三层按钮
 
@@ -343,4 +354,6 @@ class three_layter():
         self.enable_button(self.counter_button)
         self.enable_button(self.clockwise_button)
 
-        self.enable_button(self.select_box)
+        self.enable_button(self.select_type_box)
+
+

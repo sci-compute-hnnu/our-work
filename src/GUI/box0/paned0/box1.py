@@ -1,4 +1,5 @@
 import gi
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -10,9 +11,7 @@ class box1:
 
     def __init__(self, builder):
 
-
         self.box1 = builder.get_object("box1")
-
 
         """ 获取Pipline Browser"""
         self.PB_box = builder.get_object("PB_box")
@@ -20,9 +19,8 @@ class box1:
 
         """ 获取到information"""
         self.information_box = builder.get_object("information_box")
-        self.infotextview = builder.get_object('infotextview')   # 显示文本的textview
+        self.infotextview = builder.get_object('infotextview')  # 显示文本的textview
         self.information_close_button = builder.get_object("information_close")
-
 
         # 设置网格显示列表
         self.list_store = Gtk.ListStore(bool, str)
@@ -51,11 +49,9 @@ class box1:
         column_text = Gtk.TreeViewColumn("Text", renderer_text, text=1)
         self.treeview.append_column(column_text)
 
-
         """ 储存网格信息的列表 """
 
-        self.faceMeshList = []
-
+        self.MeshList = []
 
     def box1_show(self):
         if self.PB_box.get_property("visible"):
@@ -64,16 +60,14 @@ class box1:
             self.box1.hide()
 
     def PB_close(self, button, one_layer):
-        self.PB_box.hide()   # PB_box
-        one_layer.PB.set_active(False)    # 第一层的关闭按钮
-        self.box1_show()    # PB_box上的x
-
+        self.PB_box.hide()  # PB_box
+        one_layer.PB.set_active(False)  # 第一层的关闭按钮
+        self.box1_show()  # PB_box上的x
 
     def information_close(self, button, one_layer):
-        self.information_box.hide()   # information_box
-        one_layer.information.set_active(False)   # 第一层的关闭按钮
-        self.box1_show()    # information_box上的x
-
+        self.information_box.hide()  # information_box
+        one_layer.information.set_active(False)  # 第一层的关闭按钮
+        self.box1_show()  # information_box上的x
 
     def delete_clicked(self, button, showbox):
 
@@ -84,8 +78,8 @@ class box1:
             # 删除选中的项
             for path in reversed(path_list):
                 iter = model.get_iter(path)
-                model.remove(iter)    # path 就是0 , 1 ,2 索引 每次path_list只有一个
-                self.faceMeshList.pop(int(str(path)))    # 移除该面网格数据
+                model.remove(iter)  # path 就是0 , 1 ,2 索引 每次path_list只有一个
+                self.MeshList.pop(int(str(path)))  # 移除该面网格数据
 
             showbox.should_draw = self.find_true_row()
             showbox.glarea.queue_draw()
@@ -112,9 +106,8 @@ class box1:
 
             # 更新绘制
             showbox.should_draw = self.find_true_row()
-            showbox.on_realize(self)
+            showbox.on_realize(mesh=self.MeshList[showbox.should_draw])
             showbox.glarea.queue_draw()
-
 
     def reset_clicked(self, button, showbox):
 
@@ -129,7 +122,6 @@ class box1:
 
             showbox.should_draw = self.find_true_row()
             showbox.glarea.queue_draw()
-
 
     # information框打印信息
     def info_print(self, info):
@@ -147,9 +139,8 @@ class box1:
         end_iter = buffer.get_end_iter()
         buffer.insert_with_tags(end_iter, info, font_tag)
 
-
-    # 更新状态栏打勾和是否绘制
-    def on_toggle_button_toggled(self, cell, path_str, showbox):
+    # 更新状态栏打勾和绘制
+    def on_toggle_button_toggled(self, cell, path_str, showbox, select_var_box, setup_combobox):
 
         # 将路径字符串转换为TreePath对象
         path = Gtk.TreePath(path_str)
@@ -169,21 +160,47 @@ class box1:
                 if row.path != path:
                     self.list_store[row.iter][0] = False
 
-
         # step4: 以当前状态记录并更新showbox的list_store_state
         showbox.list_store_state = self.record_status_from_list_store()
-
+        showbox.color_opt = 'Neutral Mode'
+        showbox.color_opt_list = ['Neutral Mode']
 
         # step5: 更新是否绘制, 以及绘制谁
         if value:
 
             showbox.should_draw = self.find_true_row()
-            showbox.on_realize(self)
+            showbox.on_realize(mesh=self.MeshList[showbox.should_draw])
             showbox.glarea.queue_draw()
         else:
 
             showbox.should_draw = self.find_true_row()
             showbox.glarea.queue_draw()
+
+        # step6: 更新viewbox的color_opt
+        if value:
+            mesh = self.MeshList[showbox.should_draw]  # 获取字典var 将字典的keys添加至color_opt_list (注意判断mesh里有没有var)
+            showbox.color_opt = 'Neutral Mode'
+            if len(mesh.gl_var) != 0:
+                showbox.color_opt_list = list(mesh.gl_var.keys())
+            else:
+                showbox.color_opt_list = ['Neutral Mode']
+        else:
+            showbox.color_opt = 'Neutral Mode'
+            showbox.color_opt_list = ['Neutral Mode']
+
+        # step7: 更新three_layer的select_var_box
+        if value:
+            mesh = self.MeshList[showbox.should_draw]
+            if len(mesh.gl_var) != 0:
+                varList = list(mesh.gl_var.keys())
+                setup_combobox(select_var_box, ['Neutral Mode'] + varList, 'Neutral Mode')
+            else:
+                setup_combobox(select_var_box, ['Neutral Mode'], 'Neutral Mode')
+
+        else:
+            setup_combobox(select_var_box)
+            pass
+
 
 
     # 找到为True的索引 (该阶段为True的一个)
@@ -195,27 +212,23 @@ class box1:
                 return i
         return -1
 
-
     # 读取网格文件, 并存入列表
     def load_Mesh_file(self, filename):
 
         # 存入网格列表
         mesh = MeshReader(filename)
-        self.faceMeshList.append(mesh)
+        self.MeshList.append(mesh)
 
         # 更新box1的list_store
         name_only = os.path.basename(filename)
         self.list_store.append([False, name_only])
 
-
     def load_Mesh(self, mesh, name='mesh'):
 
         # 存入网格列表
-        self.faceMeshList.append(mesh)
+        self.MeshList.append(mesh)
 
         self.list_store.append([False, name])
-
-
 
     # 批量更改list_store的状态
     def from_list_change_status(self, status_list):
@@ -223,14 +236,11 @@ class box1:
         for row, status in zip(self.list_store, status_list):
             row[0] = status
 
-
     # 加个list_store的状态存入列表
     def record_status_from_list_store(self):
 
         status_list = [item[0] for item in self.list_store]
         return status_list
-
-
 
     # 实现拉索的空间范围
     def on_paned_position_changed(self, paned, param):
@@ -265,6 +275,3 @@ class box1:
             self.information_box.set_size_request(0, 0)  # 隐藏
         elif position >= second_threshold:
             self.information_box.set_size_request(-1, -1)  # 恢复默认大小
-
-
-

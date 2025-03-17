@@ -3,7 +3,7 @@ import re
 import os
 import chardet
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GdkPixbuf,GtkSource
+from gi.repository import Gtk, Gdk, GdkPixbuf, GtkSource
 
 from GUI.box0.paned0.paned1.paned2.notebook.view_box import view_box
 from GUI.box0.paned0.paned1.paned2.notebook.menu_box import meun_box
@@ -64,7 +64,6 @@ class notebook():
 
         elif func == 1:  # 网格引擎box
             bbox = view_box()
-
 
         elif func == 2:  # 显示数据box
             bbox = data_box()

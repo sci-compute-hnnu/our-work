@@ -5,7 +5,7 @@ import Utils.Mesh.GeometryUtils as GeometryUtils
 # 面网格
 class FaceMesh():
 
-    def __init__(self, points, cells, cell_type, var=np.array([])):
+    def __init__(self, points, cells, cell_type, var={}):
 
         """
         初始化 FaceMesh 对象
@@ -30,7 +30,7 @@ class FaceMesh():
         # 计算每个点的法向量
         self.gl_normal = GeometryUtils.calculate_vertex_normals(points, cells)
         # 用于渲染的数据
-        self.gl_var = var.astype(np.float32)
+        self.gl_var = var
 
 
         """ 用于计算所需数据成员 """
@@ -41,7 +41,7 @@ class FaceMesh():
 
 # 体网格
 class BodyMesh:
-    def __init__(self, points, cells, cell_type=None, var=np.array([])):
+    def __init__(self, points, cells, cell_type=None, var={}):
 
         """
         初始化 BodyMesh 对象
@@ -66,7 +66,7 @@ class BodyMesh:
         # 计算顶点法向量
         self.gl_normal = GeometryUtils.calculate_vertex_normals(points,  self.gl_cells.reshape(-1, 3))
         # 用于渲染的数据
-        self.gl_var = var.astype(np.float32) if var.size else np.array([])
+        self.gl_var = var
 
 
         """ 用于计算所需数据成员 """

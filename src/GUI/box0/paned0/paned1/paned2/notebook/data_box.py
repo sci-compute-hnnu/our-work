@@ -260,7 +260,7 @@ class data_box():
             index = tree_path.get_indices()[0]
 
             # 赋予mesh成员网格变量
-            self.mesh = box1.faceMeshList[index]
+            self.mesh = box1.MeshList[index]
 
             # 获取 attribute_combobox 内容
             tree_iter1 = self.attribute_combobox.get_active_iter()

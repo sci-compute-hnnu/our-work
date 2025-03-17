@@ -31,6 +31,8 @@ class SolverViewBoxConn:
         # 渲染次数
         self.draw_step=0
 
+        # point_var_list
+        self.point_var_list = []
 
 
     # 加载配件
@@ -65,6 +67,7 @@ class SolverViewBoxConn:
         if elapsed_time >= all_time:
             self.timer.set_text(str(all_time) + 's/' + str(all_time) + 's')
             self.box1.info_print('time over!\n\n')
+
             return False
 
         # 将命令行的输出内容捕捉并在information上打印 (如果有)
@@ -76,7 +79,7 @@ class SolverViewBoxConn:
         rtol = 1e-08
         atol = 1e-08
 
-        self.old_rotation_matrix = self.showbox.rotation_matrix.copy()
+        self.old_rotation_matrix = self.showbox.glareaClass.rotation_matrix.copy()
 
         if not (np.allclose(self.old_point_var, self.solver.point_var, rtol=rtol, atol=atol)):
             self.draw_step += 1
@@ -85,10 +88,11 @@ class SolverViewBoxConn:
             tem_var = np.array([[0, 0, value] for value in self.solver.point_var]).astype(np.float32)
             self.meshClass.gl_var = tem_var
 
-            self.showbox.on_realize(self.meshClass, self.old_rotation_matrix, self.draw_step)
+            self.showbox.on_realize(mesh=self.meshClass, rotation_matrix=self.old_rotation_matrix, draw_step=self.draw_step)
             self.showbox.should_draw = self.should_draw
             self.showbox.glarea.queue_draw()
             self.old_point_var = self.solver.point_var.copy()
+            self.point_var_list.append(self.old_point_var)
 
         return True
 

@@ -146,7 +146,7 @@ class SolverWindow:
 
             # 检查是否匹配
             if currentMeshName == meshName:
-                self.selectedMeshClass = self.box1.faceMeshList[index]  # 获取当前的索引
+                self.selectedMeshClass = self.box1.MeshList[index]  # 获取当前的索引
                 should_draw = index
                 break
 

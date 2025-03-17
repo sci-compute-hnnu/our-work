@@ -68,17 +68,30 @@ def read_off(filepath):
     return points, cells, cell_type
 
 
-# tecplot文件阅读器
 def read_dat(file):
     vertices = []
     triangle = []
     quadrilateral = []
-    var = []
+    var = {}
 
     with open(file) as f:
         # 读取并忽略前两行（TITLE 和 VARIABLES）
         f.readline()
-        f.readline()
+
+        # 读取第二行（VARIABLES）
+        variables_line = f.readline().strip()
+        variables_list = variables_line.split('=')[1].replace('"', '').split()
+
+        # 检查是否存在除坐标点外的变量
+        if 'z' in variables_list:
+            variable_names = variables_list[3:]  # 从第四个变量开始（三维）
+        else:
+            variable_names = variables_list[2:]  # 从第三个变量开始（二维）
+
+        # 若存在除坐标点外的变量，初始化字典
+        if variable_names:
+            for name in variable_names:
+                var[name] = []
 
         # 读取第三行并获取点的数量和面的数量
         zone_line = f.readline().strip().split(',')
@@ -88,18 +101,26 @@ def read_dat(file):
         # 读取顶点和 var 值
         for _ in range(n_verts):
             line = f.readline().strip().split()
-            vertices.append([float(line[0]), float(line[1]), float(line[2])])
-            var.append([0,0,float(line[3])])
+            if 'z' in variables_list:
+                vertices.append([float(line[0]), float(line[1]), float(line[2])])
+            else:
+                vertices.append([float(line[0]), float(line[1]), float(0)])
+
+            # 若存在除坐标点外的变量，读取 var 值
+            if variable_names:
+                for i, name in enumerate(variable_names):
+                    if 'z' in variables_list:
+                        var[name].append([0, 0, float(line[i + 3])])
+                    else:
+                        var[name].append([0, 0, float(line[i + 2])])
 
         vertices = np.array(vertices, dtype=np.float32)
-        var = np.array(var, dtype=np.float32)
 
         # 读取三角形面和边的信息
         for _ in range(n_faces):
             face = [int(idx) - 1 for idx in f.readline().strip().split()]  # 索引从1开始，减1以适应Python的0索引
             if len(face) == 3:
                 triangle.append(face)
-
             elif len(face) == 4:
                 quadrilateral.append(face)
 
