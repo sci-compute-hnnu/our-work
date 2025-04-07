@@ -22,9 +22,9 @@ class base_glarea:
         # GTK的openGL渲染引擎
         self.glarea = Gtk.GLArea()
 
-        #
 
         # 待绘制的边面信息
+        self.mesh=None
         self.vertices = []
         self.faces = []
         self.edges = []
@@ -131,6 +131,22 @@ class base_glarea:
         # 滚轮滑动
         self.glarea.add_events(Gdk.EventMask.SCROLL_MASK)
         self.glarea.connect('scroll-event', self.on_scroll)
+
+
+    # 加载网格
+    def load_mesh(self, mesh):
+
+        """ 获取边面信息 """
+        self.mesh = mesh
+
+        if mesh.cell_type == 'tetrahedron' or mesh.cell_type == 'hexahedron':
+            mesh = mesh.surface_mesh
+
+        self.vertices = mesh.gl_points
+        self.edges = mesh.gl_edges
+        self.faces = mesh.gl_cells
+        self.vars = mesh.gl_var
+        self.normal = mesh.gl_normal
 
 
     def init_axes(self):
@@ -281,23 +297,11 @@ class base_glarea:
         ], dtype=np.float32)
 
 
-    # 加载网格
-    def load_mesh(self, mesh):
-
-        """ 获取边面信息 """
-        self.mesh = mesh
-        self.vertices = mesh.gl_points
-        self.edges = mesh.gl_edges
-        self.faces = mesh.gl_cells
-        self.normal = mesh.gl_normal
-
-
     # 网格显示的初始化
-    def on_realize(self, rotation_matrix=None, draw_step=-1, color_opt='Neutral Mode'):  # object 可能是box1 也可能是网格类
-
+    def on_realize(self, rotation_matrix=None, color_opt='Neutral Mode'):
 
         self.var_opt = color_opt  # 当为 Neutral Mode时, 相等于没有var
-        self.var = np.array([]) if self.var_opt == "Neutral Mode" else np.array(self.mesh.gl_var[self.var_opt], dtype=np.float32)
+        self.var = np.array([]) if self.var_opt == "Neutral Mode" else np.array(self.vars[self.var_opt], dtype=np.float32)
 
         if len(self.var) != 0:
             # 取出var的最后一列
@@ -308,9 +312,6 @@ class base_glarea:
             self.var[:, -1] = self.var_last.reshape(-1)
 
         """ 更新初始网格大小 """
-
-        # 初始化旋转矩阵
-        self.rotation_matrix = np.eye(4, dtype=np.float32)
 
         # 计算放大/缩小尺寸
         changeSize = abs(np.max(self.vertices, axis=0) - np.min(self.vertices, axis=0))
@@ -327,8 +328,9 @@ class base_glarea:
             [0, 0, 0, 1]
         ], dtype=np.float32)
 
-        if draw_step == -1:
-            self.rotation_matrix = np.dot(self.rotation_matrix, tap_matrix).astype(np.float32)
+        # 初始化旋转矩阵
+        if rotation_matrix is None:
+            self.rotation_matrix = np.dot(np.eye(4), tap_matrix).astype(np.float32)
         else:
             self.rotation_matrix = rotation_matrix.astype(np.float32)
 
@@ -558,6 +560,7 @@ class base_glarea:
             glDrawElements(GL_LINES, len(self.edges), GL_UNSIGNED_INT, None)
 
         if self.var_draw:  # 绘制物体的变量
+
             """ 将变量传至着色器 """
             glUniform1i(self.isEdge_location, False)
             glUniform1i(self.isGmsh_location, False)

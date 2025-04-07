@@ -3,20 +3,28 @@ import numpy as np
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf
 
+from GUI.three_layer.PlaneEquationInputWindow import SplitPlaneEquationWindow
+
+# static scheme
+face_mesh_type = ["Points", "Lines", "Surface With Edges", "Surface", "Gmsh style"]
+volume_mesh_type = ["Points", "Lines", "Surface With Edges", "Surface", 'Feature Surface', 'Wireframe Box']
+
+# draw scheme
+face_mesh_sch = ['Surface']
+volume_mesh_sch = ['Feature Surface', 'Wireframe Box']
 
 class three_layter():
 
     def __init__(self, builder):
 
-        ''' 线面点选择框 '''
 
-        self.select_type_box = builder.get_object("select_box")
-        self.type_list = ["Points", "Lines", "Surface With Edges", "Surface", "Gmsh style"]
-        self.setup_combobox(self.select_type_box, self.type_list, 'Surface')
-
-
-        ''' 颜色绘制选择框 '''
+        ''' 变量绘制选择框 '''
         self.select_var_box = builder.get_object("select_box1")
+        self.setup_combobox(0)
+
+        ''' 线面点选择框 '''
+        self.select_type_box = builder.get_object("select_box")
+        self.setup_combobox(1)
 
         """放大放小按钮"""
 
@@ -41,6 +49,13 @@ class three_layter():
         self.clockwise_button = builder.get_object("clockwise")
         self.counter_button = builder.get_object("counterclockwise")
 
+        '''输入切面方程按钮'''
+        self.split_plane_button = builder.get_object("split_plane_button")
+
+        # 是否执行
+        self.tigger = True
+
+
 
     # 重置draw的状态
     def reset_draw_states(self, showbox):
@@ -53,14 +68,14 @@ class three_layter():
     # select_box_num=1  颜色选择框  select_box_num=2 点线面选择框
     def switch_option_in_select_box(self, select_box_num, option, showbox):
 
-        liststore = None
-        select_box = None
-
         if select_box_num == 1:  # 颜色选择框
             select_box = self.select_var_box
 
         elif select_box_num == 2:   # 点线面选择框
             select_box = self.select_type_box
+        else:
+            print('The select_box_num must be 0 or 1')
+            return
 
         liststore = select_box.get_model()
 
@@ -77,14 +92,22 @@ class three_layter():
 
 
     # 给select_box设置新的选项
-    def setup_combobox(self, select_box, options=[' '], default_option=' '):
+    def setup_combobox(self, select_box_num, options=[' '], default_option=' ', imple=False):
         """
         初始化一个 Gtk.ComboBox，添加渲染器，并设置默认选项
 
-        :param select_type_box: Gtk.ComboBox 实例
+        :param select_box_num: Gtk.ComboBox 实例 0:color opt  1: face_edge opt
         :param options: 可选项列表
         :param default_option: 默认选项"
         """
+
+        if select_box_num == 0:
+            select_box = self.select_var_box
+        elif select_box_num == 1:
+            select_box = self.select_type_box
+        else:
+            print('The select_box_num must be 0 or 1')
+            return
 
         # 创建 ListStore 对象
         liststore = Gtk.ListStore(str)
@@ -96,7 +119,7 @@ class three_layter():
         # 设置 ListStore 为 ComboBox 的模型
         select_box.set_model(liststore)
 
-        # 创建渲染器并添加到 ComboBox
+        # 创建渲染器并添加到 ComboBox  (初始化时使用)
         if not select_box.get_cells():  # 避免重复添加渲染器
             renderer = Gtk.CellRendererText()
             select_box.pack_start(renderer, True)
@@ -106,57 +129,65 @@ class three_layter():
         default_iter = liststore.get_iter_first()
         while default_iter is not None:
             if liststore.get_value(default_iter, 0) == default_option:
+                self.tigger = imple
                 select_box.set_active_iter(default_iter)
+                self.tigger = True
                 break
             default_iter = liststore.iter_next(default_iter)
+
         # 设置按钮可不可用
         if default_option == ' ':
             self.disable_button(select_box)
+            return
         else:
             self.enable_button(select_box)
 
 
 
+
     # 是否绘制 点 线 面
     def select_option_with_face_or_edge(self, widget, showbox):
-        # 获取选中项的迭代器
-        active_iter = self.select_type_box.get_active_iter()
 
-        if active_iter is not None:
-            # 获取选中项的值
-            model = self.select_type_box.get_model()
-            selected_value = model.get_value(active_iter, 0)
+        if self.tigger:
 
-            glarea = showbox.glareaClass
+            # 获取选中项的迭代器
+            active_iter = self.select_type_box.get_active_iter()
 
-            # 根据不同的选项显示对应的元素
-            if selected_value == "Lines":
-                self.reset_draw_states(showbox)  # 重置
+            if active_iter is not None:
+                # 获取选中项的值
+                model = self.select_type_box.get_model()
+                selected_value = model.get_value(active_iter, 0)
 
-                glarea.edge_draw = True
+                glarea = showbox.glareaClass
 
-            elif selected_value == "Surface":
-                self.reset_draw_states(showbox)   # 重置
+                # 根据不同的选项显示对应的元素
+                if selected_value == "Lines":
+                    self.reset_draw_states(showbox)  # 重置
 
-                glarea.face_draw = True
+                    glarea.edge_draw = True
 
-            elif selected_value == "Points":
-                self.reset_draw_states(showbox)   # 重置
+                elif selected_value == "Surface":
+                    self.reset_draw_states(showbox)   # 重置
 
-                glarea.points_draw = True
+                    glarea.face_draw = True
 
-            elif selected_value == 'Surface With Edges':
-                self.reset_draw_states(showbox)   # 重置
+                elif selected_value == "Points":
+                    self.reset_draw_states(showbox)   # 重置
 
-                glarea.edge_draw = True
-                glarea.face_draw = True
+                    glarea.points_draw = True
 
-            elif selected_value == 'Gmsh style':
+                elif selected_value == 'Surface With Edges':
+                    self.reset_draw_states(showbox)   # 重置
 
-                self.reset_draw_states(showbox)  # 重置
-                glarea.gmsh_draw = True
+                    glarea.edge_draw = True
+                    glarea.face_draw = True
 
-            glarea.glarea.queue_draw()  # 绘制更新
+                elif selected_value == 'Gmsh style':
+
+                    self.reset_draw_states(showbox)  # 重置
+                    glarea.gmsh_draw = True
+
+                showbox.queue_draw()  # 绘制更新
 
 
     # 是否绘制 颜色
@@ -183,8 +214,9 @@ class three_layter():
                 showbox.color_opt = selected_value
                 glarea.var_draw = True
 
-            showbox.on_realize()
-            glarea.glarea.queue_draw()
+            if self.tigger and selected_value != ' ':
+                showbox.on_realize(rotation_matrix=showbox.get_last_rotation())
+            showbox.queue_draw()
 
 
     # 放大或缩小按钮
@@ -212,7 +244,7 @@ class three_layter():
         glarea.rotation_matrix = np.dot(glarea.rotation_matrix, scale_matrix).astype(np.float32)
 
         # 更新渲染
-        glarea.glarea.queue_draw()
+        showbox.queue_draw()
 
 
 
@@ -261,7 +293,7 @@ class three_layter():
 
         # 更新旋转矩阵
         glarea.update_rotation_matrix()
-        glarea.glarea.queue_draw()
+        showbox.queue_draw()
 
 
     # 顺时针逆时针旋转90度
@@ -283,7 +315,7 @@ class three_layter():
             glarea.angle_y = np.pi / 2
         # 更新旋转矩阵
         glarea.update_rotation_matrix()
-        glarea.glarea.queue_draw()
+        showbox.queue_draw()
 
 
     # 颜色选择
@@ -301,9 +333,17 @@ class three_layter():
             glarea.face_color[2] = color.blue
             glarea.face_color[3] = color.alpha
 
-            glarea.glarea.queue_draw()
+            showbox.queue_draw()
 
         dialog.destroy()
+
+
+    def open_split_plane_input(self, button, showbox, box1):
+
+        SplitPlaneEquationWin = SplitPlaneEquationWindow()
+        SplitPlaneEquationWin.load_widget(showbox.get_current_mesh(), box1)
+        SplitPlaneEquationWin.run()
+
 
     # 设置按钮无法点击且颜色变灰
     def disable_button(self, button):

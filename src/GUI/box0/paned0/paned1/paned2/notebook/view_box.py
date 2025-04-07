@@ -34,29 +34,46 @@ class view_box():
         self.inner_box.pack_start(self.glarea, True, True, 0)
         self.top_box.pack_start(self.inner_box, True, True, 0)
 
+
         # 初始化list_store的状态（先初始化为20个False(默认不超过20个网格) 后续点击状态按钮是会自动更新）
         self.list_store_state = [False for _ in range(20)]
 
-        # 初始化color_opt （先初始化Neutral Mode ）
-        self.color_opt_list = ['Neutral Mode']
+        # 初始化color_opt
+        self.color_opt_list = [' ']
+        # 初始化type_opt_list
+        self.type_opt_list = [' ']
+
+        self.color_opt = ' '  # 默认绘制方式是Neutral Mode
+        self.type_opt = ' '
 
         self.should_draw = -1  # 是否进行绘制 (-1表示不绘制 0, 1, 2, 3表示绘制的网格索引号)
-
-        self.color_opt = 'Neutral Mode' # 默认绘制方式是Neutral Mode
 
 
     def on_render(self, area, contex):
 
         if self.should_draw == -1:  # 只渲染背景
+            self.glareaClass.mesh = None
             self.glareaClass.on_render_background(area, contex)
 
         else:
             self.glareaClass.on_render(area, contex)
 
 
-    def on_realize(self, mesh=None, rotation_matrix=None, draw_step=-1):
+    def on_realize(self, mesh=None, rotation_matrix=None):
 
         if mesh != None:
             self.glareaClass.load_mesh(mesh)
+        self.glareaClass.on_realize(rotation_matrix=rotation_matrix, color_opt=self.color_opt)
 
-        self.glareaClass.on_realize(rotation_matrix=rotation_matrix, draw_step=draw_step, color_opt=self.color_opt)
+
+    def queue_draw(self):
+
+        self.glarea.queue_draw()
+
+    def get_last_rotation(self):
+
+        return self.glareaClass.rotation_matrix
+
+    def get_current_mesh(self):
+
+        return self.glareaClass.mesh

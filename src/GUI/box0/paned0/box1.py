@@ -6,6 +6,9 @@ from gi.repository import Gtk
 import os
 from Utils.Mesh.MeshReader import MeshReader
 
+from GUI.three_layer.main import face_mesh_type
+from GUI.three_layer.main import volume_mesh_type
+
 
 class box1:
 
@@ -82,7 +85,7 @@ class box1:
                 self.MeshList.pop(int(str(path)))  # 移除该面网格数据
 
             showbox.should_draw = self.find_true_row()
-            showbox.glarea.queue_draw()
+            showbox.queue_draw()
 
     def apply_clicked(self, button, showbox):
 
@@ -107,7 +110,7 @@ class box1:
             # 更新绘制
             showbox.should_draw = self.find_true_row()
             showbox.on_realize(mesh=self.MeshList[showbox.should_draw])
-            showbox.glarea.queue_draw()
+            showbox.queue_draw()
 
     def reset_clicked(self, button, showbox):
 
@@ -121,7 +124,7 @@ class box1:
                 model.set_value(iter, 0, False)
 
             showbox.should_draw = self.find_true_row()
-            showbox.glarea.queue_draw()
+            showbox.queue_draw()
 
     # information框打印信息
     def info_print(self, info):
@@ -165,42 +168,45 @@ class box1:
         showbox.color_opt = 'Neutral Mode'
         showbox.color_opt_list = ['Neutral Mode']
 
-        # step5: 更新是否绘制, 以及绘制谁
-        if value:
-
-            showbox.should_draw = self.find_true_row()
-            showbox.on_realize(mesh=self.MeshList[showbox.should_draw])
-            showbox.glarea.queue_draw()
-        else:
-
-            showbox.should_draw = self.find_true_row()
-            showbox.glarea.queue_draw()
-
-        # step6: 更新viewbox的color_opt
+        # step5: 更新viewbox的color_opt
         if value:
             mesh = self.MeshList[showbox.should_draw]  # 获取字典var 将字典的keys添加至color_opt_list (注意判断mesh里有没有var)
             showbox.color_opt = 'Neutral Mode'
+            showbox.type_opt = 'Surface'
             if len(mesh.gl_var) != 0:
-                showbox.color_opt_list = list(mesh.gl_var.keys())
+                showbox.color_opt_list = ['Neutral Mode'] + list(mesh.gl_var.keys())
             else:
                 showbox.color_opt_list = ['Neutral Mode']
+
+            if mesh.cell_type == 'triangle' or mesh.cell_type == 'quadrilateral' :
+                showbox.type_opt_list = face_mesh_type
+            else:
+                showbox.type_opt_list = volume_mesh_type
+
         else:
-            showbox.color_opt = 'Neutral Mode'
-            showbox.color_opt_list = ['Neutral Mode']
+            showbox.color_opt = ' '
+            showbox.type_opt = ' '
+            showbox.color_opt_list = [' ']
+            showbox.type_opt_list = [' ']
+
+
+        # step6: 更新是否绘制, 以及绘制谁
+        if value:
+            showbox.should_draw = self.find_true_row()
+            showbox.on_realize(mesh=self.MeshList[showbox.should_draw])
+            showbox.queue_draw()
+        else:
+            showbox.should_draw = self.find_true_row()
+            showbox.queue_draw()
 
         # step7: 更新three_layer的select_var_box
         if value:
-            mesh = self.MeshList[showbox.should_draw]
-            if len(mesh.gl_var) != 0:
-                varList = list(mesh.gl_var.keys())
-                setup_combobox(select_var_box, ['Neutral Mode'] + varList, 'Neutral Mode')
-            else:
-                setup_combobox(select_var_box, ['Neutral Mode'], 'Neutral Mode')
+            setup_combobox(0, showbox.color_opt_list, showbox.color_opt)
+            setup_combobox(1, showbox.type_opt_list, showbox.type_opt)
 
         else:
-            setup_combobox(select_var_box)
-            pass
-
+            setup_combobox(0)  # 设置选择框无内容以及无法点击
+            setup_combobox(1)  # 设置选择框无内容以及无法点击
 
 
     # 找到为True的索引 (该阶段为True的一个)

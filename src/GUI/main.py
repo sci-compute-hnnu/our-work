@@ -48,7 +48,8 @@ class UI():
         self._3DMesh = self.one_layer._3DMesh
 
         """Solver的下拉列表"""
-        self.BEM = self.one_layer.BEM
+        self._2D_Solver = self.one_layer._2D_Solver
+        self._3D_Solver = self.one_layer._3D_Solver
 
         """Style的下拉列表"""
         self.default_style = self.one_layer.default_style
@@ -122,6 +123,8 @@ class UI():
         # 颜色选择按钮
         self.color_button = self.three_layer.color_button
 
+        # 切平面方程输入按钮
+        self.split_plane_button = self.three_layer.split_plane_button
 
 
         """----------------box0----------------"""
@@ -231,7 +234,8 @@ class UI():
         self._3DMesh.connect("activate", self.one_layer.open_3d_mesh_widonw)
 
         # 第一层的Solver按钮
-        self.BEM.connect("activate", self.one_layer.open_BEM_solver_window)
+        self._2D_Solver.connect("activate", self.one_layer.open_2D_solver_window)
+        self._3D_Solver.connect("activate", self.one_layer.open_3D_solver_window)
 
         self.default_style.connect("activate", self.one_layer.change_style)
         self.simple_style.connect("activate", self.one_layer.change_style)
@@ -298,6 +302,11 @@ class UI():
                                       lambda btn: self.three_layer.rotation_90(btn, self.get_current_showbox(), 1))
         self.counter_button.connect("clicked",
                                     lambda btn: self.three_layer.rotation_90(btn, self.get_current_showbox(), 2))
+
+        # 第三层切平面方程输入按钮
+        self.split_plane_button.connect("clicked",
+                                        lambda btn: self.three_layer.open_split_plane_input(
+                                            btn, self.get_current_showbox(), self.box1))
 
 
         """--------------box0连接函数--------------"""

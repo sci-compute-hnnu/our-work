@@ -1,4 +1,5 @@
 import numpy as np
+from collections import Counter
 
 
 # 判断该cell是tetrahedron或者quadrilateral  (points: (-1 ,3)  cells: (-1, 4))
@@ -158,6 +159,62 @@ def extract_faces(cells, cell_type):
         raise ValueError("Invalid cell type. Only ['tetrahedron', 'hexahedron'] are supported.")
 
     return np.array(faces, dtype=np.uint32)
+
+
+
+def check_point_order(face_vertices, reference_direction):
+    v1 = face_vertices[1] - face_vertices[0]
+    v2 = face_vertices[2] - face_vertices[0]
+    normal = np.cross(v1, v2)
+    return np.dot(normal, reference_direction) < 0
+
+
+def get_faces_from_volume_mesh(cells, vertices):
+    """
+    根据体网格单元提取边界面
+
+    参数:
+    cells: 体网格单元  shape: (n_cells, num_vector_cell) num_vector_cell e.g. tetrahedron:4 hexahedron:8
+    cell_type  单元类型  可选['tetrahedron', 'hexahedron']
+    vertices: 顶点数组 shape: (n_vertices, 3)，每个顶点是一个三维坐标 (x, y, z)
+
+    返回:
+    faces: 面单元  shape: (n_faces, 3)，每个面由三个顶点的索引定义
+    """
+    # 将cells的每三个元素转换为一个面
+    # 将cells进行unflatten处理
+    faces = cells.reshape(-1, 3)
+
+
+    # 将每个面转换为元组（如果顶点顺序可能不同而表示同一面，则使用 sorted(tuple(face))）
+    face_tuples = [tuple(sorted(face)) for face in faces]
+
+    # 使用 Counter 快速统计每个面出现的次数
+    face_counts = Counter(face_tuples)
+
+    # 只保留出现次数为 1 的面，即边界面
+    boundary_face_tuples = [face for face, count in face_counts.items() if count == 1]
+
+    # 计算整体的参考方向，例如使用所有顶点的中心到某个顶点的方向
+    center = np.mean(vertices, axis=0)
+    reference_direction = vertices[0] - center
+    reference_direction = reference_direction / np.linalg.norm(reference_direction)
+
+    # 判断面的顶点是否逆时针排序
+    boundary_face = []
+    for face in boundary_face_tuples:
+        face = list(face)
+        if not check_point_order(vertices[face], reference_direction):
+            face = [face[0], face[2], face[1]]
+        boundary_face.append(face)
+
+
+    # 将boundary_faces转换为np.array
+    boundary_face = np.array(boundary_face, dtype=np.uint32)
+
+
+
+    return np.array(boundary_face, dtype=np.uint32)
 
 
 
