@@ -15,8 +15,6 @@ class DockingSolver(SolverWrapper):
 
         self.var = ['rho', 'vx', 'vy', 'vz', 'E', 'p']
 
-        self.parameter = {{'name': 1, "type": ''}, }
-
     def initializeSolver(self, file):
         triangleMesh = DG_3D.TriangleMesh()
         triangleMesh.read_off(file)

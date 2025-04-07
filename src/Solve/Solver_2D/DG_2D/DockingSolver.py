@@ -1,5 +1,5 @@
 from Utils.Connector.SolverWrapper import SolverWrapper
-from Solve.Solver_2D.DG_2D import DG_2D
+from Solve.Solver_2D.DG_2D import PY_DG_2D
 
 
 class DockingSolver(SolverWrapper):
@@ -16,10 +16,10 @@ class DockingSolver(SolverWrapper):
         self.var = ['rho', 'vx', 'vy', 'E', 'p']
 
     def initializeSolver(self, file):
-        triangleMesh = DG_2D.TriangleMesh()
+        triangleMesh = PY_DG_2D.TriangleMesh()
         triangleMesh.read_off(file)
         triangleMesh.collect_edges()
-        self.solver = DG_2D.LinearDGSolver_2D(triangleMesh)
+        self.solver = PY_DG_2D.LinearDGSolver_2D_CycleBoundary(triangleMesh)
 
     def Solve(self, *args, **kwargs):
 
