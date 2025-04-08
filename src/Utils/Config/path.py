@@ -8,5 +8,8 @@ project_dir = str(current_file.parent.parent.parent.parent)
 # ui目录
 ui_dir = project_dir+'/ui/'
 
+# icon目录
+icon_dir = project_dir+'/icon/'
+
 # solve目录
 solve_dir = project_dir+'/src/Solve/'

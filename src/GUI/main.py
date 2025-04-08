@@ -239,9 +239,11 @@ class UI():
         self._2D_Solver.connect("activate", self.one_layer.open_2D_solver_window)
         self._3D_Solver.connect("activate", self.one_layer.open_3D_solver_window)
 
+        # 第一层的Style按钮
         self.default_style.connect("activate", self.one_layer.change_style)
         self.simple_style.connect("activate", self.one_layer.change_style)
         self.dark_style.connect("activate", self.one_layer.change_style)
+        self.default_style.emit("activate")   # 启动时默认点击默认图标按钮
 
 
         """--------------two_layerd的连接信号--------------"""
