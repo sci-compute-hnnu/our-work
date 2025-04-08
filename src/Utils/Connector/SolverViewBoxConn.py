@@ -88,7 +88,6 @@ class SolverViewBoxConn:
 
 
 
-
     def cell_to_vertex_values(self, cellsData):
 
         vertex_num = len(self.meshClass.vertexs)  # 顶点数量

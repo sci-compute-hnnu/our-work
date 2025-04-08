@@ -1,21 +1,16 @@
-def print_details(*args, **kwargs):
-    # 打印位置参数
-    if len(args) !=0:
-        print(args[0])
+import numpy as np
 
-    # print(args[0], args[1])
-    # 打印关键字参数
-    print("\n关键字参数:")
-    for key, value in kwargs.items():
-        print(f"{key}: {value}")
+# 假设 n 和 num 的值
+n = 3
+num = 4
 
+# 创建一个长度为 n * num 的 ndarray
+arr = np.arange(n * num)
 
-# 调用函数
-names = ("Alice", "Bob", "Charlie")
-info = {
-    "age": 25,
-    "city": "New York",
-    "occupation": "Engineer"
-}
+# 使用 reshape 方法将数组转换为所需的形状
+reshaped_arr = arr.reshape(n, -1)
 
-print_details((), **info)
+print("原始数组：")
+print(arr)
+print("重塑后的数组：")
+print(reshaped_arr)

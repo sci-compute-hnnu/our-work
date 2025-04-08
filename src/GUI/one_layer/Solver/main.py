@@ -236,10 +236,8 @@ class SolverWindow:
     def on_selection_changed(self, widget):
 
         # 构建求解器
-        folder_dim = '/Solver_2D/' if self.dim == 2 else '/solver_3D/'
+        folder_dim = '/Solver_2D/' if self.dim == 2 else '/Solver_3D/'
         selected_text = widget.get_active_text()
-        if selected_text:
-            self.solver_name.set_text(selected_text)
         solver_path = solve_dir + folder_dim + selected_text + '/DockingSolver.py'
         solver = self.get_docking_solver(solver_path)
         self.docking_solver = solver
