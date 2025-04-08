@@ -11,7 +11,7 @@ import numpy as np
 
 from Utils.Connector.SolverViewBoxConn import SolverViewBoxConn
 
-from Solve.path import solve_dir
+from Utils.Config.path import solve_dir
 
 class SolverWindow:
 

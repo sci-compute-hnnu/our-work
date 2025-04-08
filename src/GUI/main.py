@@ -8,13 +8,15 @@ from GUI.one_layer.main import one_layer
 from GUI.two_layer.main import two_layer
 from GUI.three_layer.main import three_layter
 
+from Utils.Config.path import ui_dir
+
 
 class UI():
 
     def __init__(self):
 
         self.builder = Gtk.Builder()
-        self.builder.add_from_file("../../ui/main.glade")
+        self.builder.add_from_file(ui_dir+'main.glade')
 
         self.window = self.builder.get_object("window")
         self.window.connect("destroy", Gtk.main_quit)

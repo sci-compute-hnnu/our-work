@@ -2,13 +2,13 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk
 
-
 from Utils.Mesh.MeshSplitter import MeshSplitter
+from Utils.Config.path import ui_dir
 
 class SplitPlaneEquationWindow:
     def __init__(self):
         self.builder = Gtk.Builder()
-        self.builder.add_from_file("../../ui/plane_equation.glade")  # 替换为你的 glade 文件名
+        self.builder.add_from_file(ui_dir+'plane_equation.glade')  # 替换为你的 glade 文件名
         self.builder.connect_signals(self)
 
         self.window = self.builder.get_object("window1")

@@ -1,13 +1,13 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from GUI.one_layer.Solver.main import SolverWindow
-
+from Utils.Config.path import ui_dir
 
 
 class Solver3DWindow(SolverWindow):
     def __init__(self, box1, notebook, two_layer, three_layer):
 
-        super().__init__('../../ui/solver.glade', box1, notebook, two_layer, three_layer)
+        super().__init__(ui_dir+'solver.glade', box1, notebook, two_layer, three_layer)
 
         self.dim = 3
 

@@ -4,14 +4,14 @@ from gi.repository import Gtk, Gdk
 
 
 from GUI.box0.paned0.paned1.paned2.notebook.top_box_of_every_type import top_box_of_every_type
-
+from Utils.Config.path import ui_dir
 
 class data_box():
 
     def __init__(self):
 
         self.builder = Gtk.Builder()
-        self.builder.add_from_file("../../ui/data_box.glade")
+        self.builder.add_from_file(ui_dir+'data_box.glade')
 
         # temp_top_box
         self.temp_top_box = self.builder.get_object("temp_top_box")

@@ -7,6 +7,7 @@
 
 
 从源代码启动该项目需要求在Linux(Ubuntu)上执行,如需使用solve模块需借助pybind11技术
+
  (详情参考https://pybind11.readthedocs.io/en/stable/basics.html)
 
 本项目第三方图形界面采用GTK, 如在Ubuntu自带python解释器上启动该项目，无需安装GTK(PyGobject), 
