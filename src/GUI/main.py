@@ -8,13 +8,15 @@ from GUI.one_layer.main import one_layer
 from GUI.two_layer.main import two_layer
 from GUI.three_layer.main import three_layter
 
+from Utils.Config.path import ui_dir
+
 
 class UI():
 
     def __init__(self):
 
         self.builder = Gtk.Builder()
-        self.builder.add_from_file("../../ui/main.glade")
+        self.builder.add_from_file(ui_dir+'main.glade')
 
         self.window = self.builder.get_object("window")
         self.window.connect("destroy", Gtk.main_quit)
@@ -48,7 +50,8 @@ class UI():
         self._3DMesh = self.one_layer._3DMesh
 
         """Solver的下拉列表"""
-        self.BEM = self.one_layer.BEM
+        self._2D_Solver = self.one_layer._2D_Solver
+        self._3D_Solver = self.one_layer._3D_Solver
 
         """Style的下拉列表"""
         self.default_style = self.one_layer.default_style
@@ -90,7 +93,8 @@ class UI():
 
         """
             部件
-            select_box: 点线面选择绘制按钮
+            select_type_box: 点线面选择绘制按钮
+            select_var_box: 颜色选择绘制按钮
             sb_button, bs_button:  变大变小按钮
             Xposi_button...  :     坐标轴旋转按钮
             Color:    颜色选择按钮
@@ -98,8 +102,8 @@ class UI():
         self.three_layer = three_layter(self.builder)
 
         # 线面点绘制选择按钮
-        self.select_box = self.three_layer.select_box
-        self.select_box1 = self.three_layer.select_box1
+        self.select_type_box = self.three_layer.select_type_box
+        self.select_var_box = self.three_layer.select_var_box
 
         # 变大变小按钮
         self.sb_button = self.three_layer.sb_button
@@ -121,6 +125,8 @@ class UI():
         # 颜色选择按钮
         self.color_button = self.three_layer.color_button
 
+        # 切平面方程输入按钮
+        self.split_plane_button = self.three_layer.split_plane_button
 
 
         """----------------box0----------------"""
@@ -230,11 +236,14 @@ class UI():
         self._3DMesh.connect("activate", self.one_layer.open_3d_mesh_widonw)
 
         # 第一层的Solver按钮
-        self.BEM.connect("activate", self.one_layer.open_BEM_solver_window)
+        self._2D_Solver.connect("activate", self.one_layer.open_2D_solver_window)
+        self._3D_Solver.connect("activate", self.one_layer.open_3D_solver_window)
 
+        # 第一层的Style按钮
         self.default_style.connect("activate", self.one_layer.change_style)
         self.simple_style.connect("activate", self.one_layer.change_style)
         self.dark_style.connect("activate", self.one_layer.change_style)
+        self.default_style.emit("activate")   # 启动时默认点击默认图标按钮
 
 
         """--------------two_layerd的连接信号--------------"""
@@ -266,9 +275,9 @@ class UI():
 
         """--------------three_layerd连接函数--------------"""
         # 第三层的选择框
-        self.select_box.connect('changed', lambda btn: self.three_layer.select_option_with_face_or_edge(
+        self.select_type_box.connect('changed', lambda btn: self.three_layer.select_option_with_face_or_edge(
                                                                                     btn, self.get_current_showbox()))
-        self.select_box1.connect('changed', lambda btn: self.three_layer.select_option_with_color(
+        self.select_var_box.connect('changed', lambda btn: self.three_layer.select_option_with_color(
                                                                                     btn, self.get_current_showbox()))
         # 第三层的变大变小按钮
         self.sb_button.connect('clicked',
@@ -298,6 +307,11 @@ class UI():
         self.counter_button.connect("clicked",
                                     lambda btn: self.three_layer.rotation_90(btn, self.get_current_showbox(), 2))
 
+        # 第三层切平面方程输入按钮
+        self.split_plane_button.connect("clicked",
+                                        lambda btn: self.three_layer.open_split_plane_input(
+                                            btn, self.get_current_showbox(), self.box1))
+
 
         """--------------box0连接函数--------------"""
         """  paned部分  """
@@ -311,7 +325,7 @@ class UI():
         # treeview的按钮列 （状态栏）
         self.box1.renderer_toggle.connect("toggled",
                                           lambda *args: self.box1.on_toggle_button_toggled(args[0], args[1],
-                                                                                           self.get_current_showbox()))
+                                            self.get_current_showbox(), self.select_var_box, self.three_layer.setup_combobox))
         # Pipline Browse 的关闭按钮
         self.PB_close_button.connect("clicked", self.box1.PB_close, self.one_layer)
 

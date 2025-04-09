@@ -80,21 +80,6 @@ class two_layer():
             # 读入网格数据
             box1.load_Mesh_file(selected_file)
 
-            # """将新添加的网格设置为True 其余为False"""
-            # 在box1.list_store添加新条目并设置为True
-            # new_iter = box1.list_store.append([False, name_only])
-            # # 获取新添加条目的路径
-            # new_path = box1.list_store.get_path(new_iter)
-            # # 添加了新条目后旧条目变成False
-            # for row in box1.list_store:
-            #     # 获取当前条目的路径
-            #     path = box1.list_store.get_path(row.iter)
-            #     # 检查当前条目是否不是新添加的条目
-            #     if path != new_path:
-            #         # 将当前条目的状态设置为False
-            #         box1.list_store[row.iter][0] = False
-
-
             """更新showbox 的状态列表"""
             showbox.list_store_state = box1.record_status_from_list_store()
 
@@ -114,7 +99,7 @@ class two_layer():
         showbox.back_green = back_color.value[1]
         showbox.back_blue = back_color.value[2]
 
-        showbox.glarea.queue_draw()
+        showbox.queue_draw()
 
 
 

@@ -3,7 +3,7 @@ import re
 import os
 import chardet
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GdkPixbuf,GtkSource
+from gi.repository import Gtk, Gdk, GdkPixbuf, GtkSource
 
 from GUI.box0.paned0.paned1.paned2.notebook.view_box import view_box
 from GUI.box0.paned0.paned1.paned2.notebook.menu_box import meun_box
@@ -64,7 +64,6 @@ class notebook():
 
         elif func == 1:  # 网格引擎box
             bbox = view_box()
-
 
         elif func == 2:  # 显示数据box
             bbox = data_box()
@@ -257,9 +256,11 @@ class notebook():
 
             # 设置第三层的按钮可点击
             self.three_layer.enable_three_layer()
-            self.showbox.glarea.queue_draw()
+            self.showbox.queue_draw()
             # 更换list_store_status的状态
             self.box1.from_list_change_status(self.showbox.list_store_state)
+            self.three_layer.setup_combobox(0, self.showbox.color_opt_list, self.showbox.color_opt)
+            self.three_layer.setup_combobox(1, self.showbox.type_opt_list, self.showbox.type_opt)
 
 
         # 如果更换到的是meun_box

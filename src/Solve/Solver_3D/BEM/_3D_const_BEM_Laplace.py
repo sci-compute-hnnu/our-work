@@ -2,17 +2,18 @@ import numpy as np
 from scipy.sparse.linalg import LinearOperator, gmres, lgmres
 import time
 
-from Utils.Mesh.MeshClass import FaceMesh
 import meshio
 
 class BEM_3DCESolver():
 
-    def __init__(self, meshClass):  # 用于绘制OpenGL和计算
+    def __init__(self, path):  # 用于绘制OpenGL和计算
 
-        self.meshClass = meshClass
+        mesh = meshio.read(path)
+        vertexs = mesh.points
+        faces = mesh.cells_dict['triangle']
 
-        self.vertexs = self.meshClass.solve_vertexs   # 所有结点值
-        self.faces = self.meshClass.solve_faces   # 每个单元对应的节点编号
+        self.vertexs = vertexs  # 所有结点值
+        self.faces = faces   # 每个单元对应的节点编号
 
         self.nodes = (self.vertexs[self.faces[:, 0], :] + self.vertexs[self.faces[:, 1], :] +
                       self.vertexs[self.faces[:, 2], :]) / 3  # 配置点
@@ -69,10 +70,8 @@ class BEM_3DCESolver():
             gAx[i] = psi[i] + B_i
         self.step += 1
 
-
         # 计算每个面的权值
         self.cell_var = gAx
-        self.point_var = self.per_vertex_var(self.cell_var)
 
         t2 = time.time()
         print(self.step)
@@ -80,9 +79,15 @@ class BEM_3DCESolver():
 
         return gAx
 
+
+    def getRenderingData(self):
+
+        return self.cell_var
+
+
+
     def computeRHS(self, bdry_fun):
         self.rhs = bdry_fun(self.nodes)  # 右端向量, 即边界值
-        print(self.rhs)
         return
 
     def gmres_callback(self, density):
@@ -133,44 +138,15 @@ class BEM_3DCESolver():
         return L2Err
 
 
-    # 用面的权值计算点的权值(取平均)
-    def per_vertex_var(self, cellsData):
-        # 计算顶点法线
-        VN = np.zeros(self.vertexs.shape[0], dtype=np.float32)
-
-        facess = np.array(self.faces).reshape(-1, 3)
-
-        for i in range(len(self.vertexs)):
-
-            num = 0
-            faces_using = np.where(facess == i)[0]
-
-            for j in faces_using:
-                VN[i] += cellsData[j]
-                num += 1
-            VN[i] = VN[i] / num
-
-        return VN
-
-
-    def Solve(self, g):
-
-        self.ComputeSingularIntegral()
-        self.computeRHS(g)
-        self.solve()
-
 if __name__ == "__main__":
     # g = lambda x: 1 / np.sqrt((x[:, 0] - 1) ** 2 + (x[:, 1] - 1) ** 2 + (x[:, 2] - 1) ** 2)  # 内问题的边值条件
     g = lambda x: 1 / np.sqrt(x[:, 0] ** 2 + x[:, 1] ** 2 + x[:, 2] ** 2)  # 外问题的边值条件
 
-    # 读取网格信息d
-    mesh = meshio.read('../../../data/ball_triangleMesh.off')
-    vertexs = mesh.points
-    faces = mesh.cells_dict['triangle']
+    # 读取网格信息
+    path = '../../../../data/ball_triangleMesh.off'
 
-    facemesh1 = FaceMesh(vertexs, faces, "triangle")
-    bemsolver = BEM_3DCESolver(facemesh1)
-    bemsolver.Solve(g)
+    bemsolver = BEM_3DCESolver(path)
+
 
 
 
