@@ -4,6 +4,8 @@ from gi.repository import Gtk
 
 from Pre.MeshGeneration import _2D_generate_mesh, _2D_generate_stru_mesh
 from Utils.Mesh.MeshClass import FaceMesh
+from Utils.Config.path import ui_dir
+
 
 class _2DMeshWindow:
 
@@ -12,7 +14,7 @@ class _2DMeshWindow:
         # 初始化 GTK Builder
         self.builder = Gtk.Builder()
         # 从 Glade 文件加载界面
-        self.builder.add_from_file("../../ui/2D_mesh.glade")
+        self.builder.add_from_file(ui_dir+'2D_mesh.glade')
 
         # 获取主窗口对象
         self.window = self.builder.get_object("window")

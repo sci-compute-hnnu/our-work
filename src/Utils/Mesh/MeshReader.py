@@ -68,17 +68,34 @@ def read_off(filepath):
     return points, cells, cell_type
 
 
-# tecplot文件阅读器
 def read_dat(file):
+
+    tecpolt_name = ['Triangular', 'Quadrilateral','Tetrahedral', 'Hexahedron']
+    mesh_name = ['triangle', 'quadrilateral', 'tetrahedron', 'hexahedron']
     vertices = []
-    triangle = []
-    quadrilateral = []
-    var = []
+    cell = []
+    var = {}
 
     with open(file) as f:
-        # 读取并忽略前两行（TITLE 和 VARIABLES）
-        f.readline()
-        f.readline()
+        tecplot_type = f.readline().split('"')[1].split()[0]
+        if tecplot_type not in tecpolt_name:
+            raise ValueError("Tecplot data file has an invalid mesh type name")
+        cell_type = mesh_name[tecpolt_name.index(tecplot_type)]
+
+        # 读取第二行（VARIABLES）
+        variables_line = f.readline().strip()
+        variables_list = variables_line.split('=')[1].replace('"', '').split()
+
+        # 检查是否存在除坐标点外的变量
+        if 'z' in variables_list:
+            variable_names = variables_list[3:]  # 从第四个变量开始（三维）
+        else:
+            variable_names = variables_list[2:]  # 从第三个变量开始（二维）
+
+        # 若存在除坐标点外的变量，初始化字典
+        if variable_names:
+            for name in variable_names:
+                var[name] = []
 
         # 读取第三行并获取点的数量和面的数量
         zone_line = f.readline().strip().split(',')
@@ -88,24 +105,30 @@ def read_dat(file):
         # 读取顶点和 var 值
         for _ in range(n_verts):
             line = f.readline().strip().split()
-            vertices.append([float(line[0]), float(line[1]), float(line[2])])
-            var.append([0,0,float(line[3])])
+            if 'z' in variables_list:
+                vertices.append([float(line[0]), float(line[1]), float(line[2])])
+            else:
+                # 但没有z的时候(二维数据),补充z为0
+                vertices.append([float(line[0]), float(line[1]), float(0)])
+
+            # 若存在除坐标点外的变量，读取 var 值
+            if variable_names:
+                for i, name in enumerate(variable_names):
+                    if 'z' in variables_list:
+                        var[name].append(float(line[i + 3]))
+                    else:
+                        var[name].append(float(line[i + 2]))
 
         vertices = np.array(vertices, dtype=np.float32)
-        var = np.array(var, dtype=np.float32)
 
         # 读取三角形面和边的信息
         for _ in range(n_faces):
             face = [int(idx) - 1 for idx in f.readline().strip().split()]  # 索引从1开始，减1以适应Python的0索引
-            if len(face) == 3:
-                triangle.append(face)
+            cell.append(face)
 
-            elif len(face) == 4:
-                quadrilateral.append(face)
+        cell = np.array(cell)
 
-        cell = np.array(triangle)
-
-    return vertices, cell, var
+    return vertices, cell, cell_type, var
 
 
 # 网格读取器
@@ -120,13 +143,16 @@ def MeshReader(path):
     if ext == 'off':
         # 如果是 off 文件，按面网格读取
         vertices, cell, cell_type = read_off(path)
-        return FaceMesh(vertices, cell, cell_type)
+
+        return (FaceMesh if cell_type in {'triangle', 'quadrilateral'} else BodyMesh)\
+            (vertices, cell, cell_type, file_path=path)
 
     elif ext == 'dat':
         # 如果是 dat 文件，按体网格读取
-        vertices, cell, var = read_dat(path)
+        vertices, cell, cell_type, var = read_dat(path)
 
-        return FaceMesh(vertices, cell, 'triangle', var)
+        return (FaceMesh if cell_type in {'triangle', 'quadrilateral'} else BodyMesh)\
+            (vertices, cell, cell_type, var, file_path=path)
 
     else:
         # 使用 meshio 读取其他类型的文件
@@ -148,10 +174,10 @@ def MeshReader(path):
                 return None
             elif 'tetra' in cells_dict:  # 四面体网格
                 cells = cells_dict['tetra'].astype(np.uint32)
-                return BodyMesh(points, cells, "tetrahedron")
+                return BodyMesh(points, cells, "tetrahedron", file_path=path)
             elif 'hexahedron' in cells_dict:   # 六面体网格
                 cells = cells_dict['hexahedron'].astype(np.uint32)
-                return BodyMesh(points, cells, 'hexahedron')
+                return BodyMesh(points, cells, 'hexahedron', file_path=path)
 
         else:  # 处理面网格
 
@@ -160,8 +186,8 @@ def MeshReader(path):
                 return None
             elif 'triangle' in cells_dict:  # 三角形网格
                 cells = cells_dict['triangle'].astype(np.uint32)
-                return FaceMesh(points, cells, 'triangle')
+                return FaceMesh(points, cells, 'triangle', file_path=path)
             elif 'quad' in cells_dict:   # 四边形网格
                 cells = cells_dict['quad'].astype(np.uint32)
-                return FaceMesh(points, cells, 'quadrilateral')
+                return FaceMesh(points, cells, 'quadrilateral', file_path=path)
 

@@ -230,12 +230,3 @@ class top_box_of_every_type():
             notebookClass.choose_one_box(widget=None, event=None, bbox=new_menubox, force=True)
 
 
-
-
-
-
-
-
-
-
-

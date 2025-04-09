@@ -5,7 +5,7 @@ import Utils.Mesh.GeometryUtils as GeometryUtils
 # 面网格
 class FaceMesh():
 
-    def __init__(self, points, cells, cell_type, var=np.array([])):
+    def __init__(self, points, cells, cell_type, var={}, file_path=None):
 
         """
         初始化 FaceMesh 对象
@@ -19,6 +19,13 @@ class FaceMesh():
 
         # 单元类型
         self.cell_type = cell_type
+        # 文件地址 (None表示由软件内生成)
+        self.file_path = file_path
+
+        """ 用于计算所需数据成员 """
+        # 计算所需数据
+        self.vertexs = points
+        self.cells = cells
 
         """ 用于openGL渲染的数据成员 """
         # 点 ：包含网格中所有顶点的坐标。 二维数组，形状为 (顶点数, 3)，每行包含一个顶点的三维坐标（x, y, z）。
@@ -30,18 +37,14 @@ class FaceMesh():
         # 计算每个点的法向量
         self.gl_normal = GeometryUtils.calculate_vertex_normals(points, cells)
         # 用于渲染的数据
-        self.gl_var = var.astype(np.float32)
+        self.gl_var = {k: np.column_stack((np.zeros(len(v)), np.zeros(len(v)), v)) for k, v in var.items()}
 
-
-        """ 用于计算所需数据成员 """
-        # 计算所需数据
-        self.solve_vertexs = points
-        self.solve_faces = cells
 
 
 # 体网格
 class BodyMesh:
-    def __init__(self, points, cells, cell_type=None, var=np.array([])):
+
+    def __init__(self, points, cells, cell_type=None, var={}, file_path=None):
 
         """
         初始化 BodyMesh 对象
@@ -55,6 +58,14 @@ class BodyMesh:
 
         # 单元类型
         self.cell_type = cell_type  # 单元类型，可以为空或指定具体类型
+        # 文件地址 (None表示由软件内生成)
+        self.file_path = file_path
+
+
+        """ 用于计算所需数据成员 """
+        # 计算所需数据
+        self.vertexs = points
+        self.cells = cells
 
         """ 用于openGL渲染的数据成员 """
         # 点 ：包含网格中所有顶点的坐标。 二维数组，形状为 (顶点数, 3)，每行包含一个顶点的三维坐标（x, y, z）。
@@ -66,10 +77,8 @@ class BodyMesh:
         # 计算顶点法向量
         self.gl_normal = GeometryUtils.calculate_vertex_normals(points,  self.gl_cells.reshape(-1, 3))
         # 用于渲染的数据
-        self.gl_var = var.astype(np.float32) if var.size else np.array([])
+        self.gl_var = {k: np.column_stack((np.zeros(len(v)), np.zeros(len(v)), v)) for k, v in var.items()}
 
+        surface_cells = GeometryUtils.get_faces_from_volume_mesh(self.gl_cells, self.gl_points)
+        self.surface_mesh = FaceMesh(points, surface_cells, 'triangle', var)
 
-        """ 用于计算所需数据成员 """
-        # 计算所需数据
-        self.solve_vertexs = points
-        self.solve_cells = cells
