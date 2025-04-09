@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="title">输入平面方程</property>
+    <property name="default-width">250</property>
+    <property name="default-height">150</property>
+    <child>
+      <object class="GtkBox" id="main_box">
+        <property name="orientation">vertical</property>
+        <property name="spacing">5</property>
+        <property name="margin">10</property>
+        <child>
+          <object class="GtkLabel" id="label_title">
+            <property name="label">请输入平面方程参数 (Ax + By + Cz + D = 0)</property>
+            <property name="xalign">0.5</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkGrid" id="grid_inputs">
+            <property name="column-spacing">5</property>
+            <property name="row-spacing">5</property>
+            <child>
+              <object class="GtkEntry" id="entry_a">
+                <property name="width-chars">5</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="entry_b">
+                <property name="width-chars">5</property>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="entry_c">
+                <property name="width-chars">5</property>
+              </object>
+              <packing>
+                <property name="left-attach">2</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="entry_d">
+                <property name="width-chars">5</property>
+              </object>
+              <packing>
+                <property name="left-attach">3</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+          </object>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <object class="GtkButton" id="button_confirm">
+            <property name="label">确认</property>
+            <property name="margin-top">10</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

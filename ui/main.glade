@@ -224,10 +224,18 @@
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <child>
-      <object class="GtkMenuItem" id="BEM">
+      <object class="GtkMenuItem" id="2D_Solver">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes">BEM</property>
+        <property name="label" translatable="yes">2D Solver</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="3D_Solver">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">3D Solver</property>
         <property name="use-underline">True</property>
       </object>
     </child>
@@ -1120,7 +1128,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="split_plane_button">
                 <property name="width-request">65</property>
                 <property name="height-request">50</property>
                 <property name="visible">True</property>
@@ -1155,7 +1163,6 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\MainPage\Default\x+.png</property>
                   </object>
                 </child>
               </object>
@@ -1177,7 +1184,6 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\MainPage\Default\x-.png</property>
                   </object>
                 </child>
               </object>
@@ -1199,7 +1205,6 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\MainPage\Default\Y+.png</property>
                   </object>
                 </child>
               </object>
@@ -1221,7 +1226,6 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\MainPage\Default\Y-.png</property>
                   </object>
                 </child>
               </object>
@@ -1244,7 +1248,6 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\MainPage\Default\z+.png</property>
                   </object>
                 </child>
               </object>
@@ -1267,7 +1270,6 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\MainPage\Default\z-.png</property>
                   </object>
                 </child>
               </object>
@@ -1290,7 +1292,6 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\MainPage\Default\right_90.png</property>
                   </object>
                 </child>
               </object>
@@ -1313,7 +1314,6 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\MainPage\Default\left_90.png</property>
                   </object>
                 </child>
               </object>
@@ -1336,7 +1336,6 @@
                     <property name="width-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="pixbuf">../images\MainPage\Default\axis.png</property>
                   </object>
                 </child>
               </object>
@@ -2102,7 +2101,6 @@
                       <object class="GtkImage" id="project_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\MainPage\Default\project.png</property>
                       </object>
                     </child>
                   </object>
@@ -2123,7 +2121,6 @@
                       <object class="GtkImage" id="var_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\MainPage\Default\variable.png</property>
                       </object>
                     </child>
                   </object>
@@ -2144,7 +2141,6 @@
                       <object class="GtkImage" id="plugin_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\MainPage\Default\plugin.png</property>
                       </object>
                     </child>
                   </object>
