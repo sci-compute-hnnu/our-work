@@ -5,7 +5,8 @@ from gi.repository import Gtk, Gdk, GdkPixbuf
 
 from GUI.one_layer.Mesh._2D_Mesh.main import _2DMeshWindow
 from GUI.one_layer.Mesh._3D_Mesh.main import _3DMeshWindow
-from GUI.one_layer.Solver.BEM.main import BEMSolverWindow
+from GUI.one_layer.Solver.Solver2D.main import Solver2DWindow
+from GUI.one_layer.Solver.Solver3D.main import Solver3DWindow
 from GUI.one_layer.Style.main import Style
 
 class one_layer():
@@ -62,7 +63,8 @@ class one_layer():
         self._3DMesh = builder.get_object("3Dmesh")
 
         """Solver下拉菜单"""
-        self.BEM = builder.get_object('BEM')
+        self._2D_Solver = builder.get_object('2D_Solver')
+        self._3D_Solver = builder.get_object('3D_Solver')
 
         """Style下拉菜单"""
         self.default_style = builder.get_object("Default_style")
@@ -108,7 +110,7 @@ class one_layer():
     def delete_clicked(self, button, showbox,  box1):
         if showbox.should_draw and box1.Pp_box.get_property("visible"):
             showbox.should_draw = False
-            showbox.glarea.queue_draw()
+            showbox.queue_draw()
         if box1.PB_box.get_property("visible"):
             # 获取选中项的路径
             selection = box1.treeview.get_selection()
@@ -122,7 +124,7 @@ class one_layer():
     def apply_clicked(self, button, showbox,  box1):
         if showbox.selected_file is not None and box1.Pp_box.get_property("visible"):
             showbox.should_draw = True
-            showbox.glarea.queue_draw()
+            showbox.queue_draw()
             if box1.PB_box.get_property("visible"):
                 # 自动选中复选框按钮
                 model = box1.treeview.get_model()
@@ -131,7 +133,7 @@ class one_layer():
     def reset_clicked(self, button, showbox, box1):
         if box1.Pp_box.get_property("visible"):
             showbox.should_draw = False
-            showbox.glarea.queue_draw()
+            showbox.queue_draw()
             if box1.PB_box.get_property("visible"):
                 # 自动选中复选框按钮
                 model = box1.treeview.get_model()
@@ -149,8 +151,6 @@ class one_layer():
     " ---------- Mesh -----------"
     def open_2d_mesh_widonw(self, button):
 
-        # 获取Mesh name 的默认名字
-
         _2DMeshWin = _2DMeshWindow()
         _2DMeshWin.loadWidget(self.box1)
         _2DMeshWin.run()
@@ -163,10 +163,16 @@ class one_layer():
 
 
     " -----------Solver-----------"
-    def open_BEM_solver_window(self, button):
+    def open_2D_solver_window(self, button):
 
-        BEMSolverWin = BEMSolverWindow(self.box1, self.noteboox, self.two_layer, self.three_layer)
-        BEMSolverWin.run()
+        Solver2DWin = Solver2DWindow(self.box1, self.noteboox, self.two_layer, self.three_layer)
+        Solver2DWin.run()
+
+    def open_3D_solver_window(self, button):
+
+        Solver3DWin = Solver3DWindow(self.box1, self.noteboox, self.two_layer, self.three_layer)
+        Solver3DWin.run()
+
 
     " ----------Style---------- "
     def change_style(self, button):
