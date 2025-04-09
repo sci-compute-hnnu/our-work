@@ -2,7 +2,6 @@ import gmsh
 import pygmsh
 import numpy as np
 
-
 def _2D_generate_mesh(shape, mesh_size, algorithm, selection):
     with pygmsh.geo.Geometry() as geom:
         if shape[0] == "circle":
