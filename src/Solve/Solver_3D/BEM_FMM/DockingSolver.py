@@ -31,4 +31,4 @@ class DockingSolver(SolverWrapper):
 
         self.solver.ComputeSingularIntegral()
         self.solver.computeRHS(g)
-        self.solver.solve()
+        self.solver.preconditionsolve()
