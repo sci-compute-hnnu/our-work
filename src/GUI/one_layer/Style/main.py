@@ -71,7 +71,7 @@ class Style():
             "right2_image": "media-seek-forward", "right3_image": "pan-end-symbolic",
             "circle_image": "media-playlist-repeat", "camera_image": "camera-photo-symbolic",
             "no_camera_image": "camera-disabled-symbolic", "legend_image": "image-x-generic",
-            "gmsh_image": "gtk3-demo", "zoomout_image": "view-fullscreen-symbolic",
+            "gmsh_image": "applications-graphics-symbolic", "zoomout_image": "view-fullscreen-symbolic",
             "zoomin_image": "view-restore"
         }
 

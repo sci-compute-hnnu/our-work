@@ -19,20 +19,25 @@ class top_box_of_every_type():
         # 第一层的三个按钮 (水平, 竖直分割, 关闭)
         button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
 
-        horizontal_image = Gtk.Image.new_from_icon_name("sidebar-show-right-symbolic", Gtk.IconSize.BUTTON)
+        horizontal_image = Gtk.Image.new_from_icon_name("sidebar-show-symbolic", Gtk.IconSize.LARGE_TOOLBAR)
         self.horizontal = Gtk.Button()  # 创建空白按钮
         self.horizontal.set_image(horizontal_image)  # 将图像添加到按钮
         self.horizontal.set_relief(Gtk.ReliefStyle.NONE)
 
-        vertical_image = Gtk.Image.new_from_icon_name("sidebar-show-symbolic", Gtk.IconSize.BUTTON)
+        vertical_image = Gtk.Image.new_from_icon_name("scanner-symbolic", Gtk.IconSize.LARGE_TOOLBAR)
         self.vertical = Gtk.Button()
         self.vertical.set_image(vertical_image)
         self.vertical.set_relief(Gtk.ReliefStyle.NONE)
 
-        close_image = Gtk.Image.new_from_icon_name("window-close-symbolic", Gtk.IconSize.BUTTON)
+        close_image = Gtk.Image.new_from_icon_name("window-close-symbolic", Gtk.IconSize.LARGE_TOOLBAR)
         self.close_box_button = Gtk.Button()
         self.close_box_button.set_image(close_image)
         self.close_box_button.set_relief(Gtk.ReliefStyle.NONE)
+
+        # 调整按钮的大小请求,使得按钮栏变窄
+        self.horizontal.set_size_request(40, 30)  # 设置宽度和高度
+        self.vertical.set_size_request(40, 30)
+        self.close_box_button.set_size_request(40, 30)
 
         button_box.pack_end(self.close_box_button, False, False, 0)
         button_box.pack_end(self.vertical, False, False, 0)
@@ -50,21 +55,6 @@ class top_box_of_every_type():
         # 控制部件水平和垂直的扩展行为
         self.top_box.set_hexpand(True)
         self.top_box.set_vexpand(True)
-
-        ##选择更大的图标尺寸: 使用 Gtk.IconSize.LARGE_TOOLBAR 或其他较大的图标尺寸来代替默认的小图标尺寸：
-        horizontal_image = Gtk.Image.new_from_icon_name("sidebar-show-right-symbolic", Gtk.IconSize.LARGE_TOOLBAR)
-        self.horizontal.set_image(horizontal_image)
-
-        vertical_image = Gtk.Image.new_from_icon_name("sidebar-show-symbolic", Gtk.IconSize.LARGE_TOOLBAR)
-        self.vertical.set_image(vertical_image)
-
-        close_image = Gtk.Image.new_from_icon_name("window-close-symbolic", Gtk.IconSize.LARGE_TOOLBAR)
-        self.close_box_button.set_image(close_image)
-
-        # 调整按钮的大小请求,使得按钮栏变窄
-        self.horizontal.set_size_request(40, 30)  # 设置宽度和高度
-        self.vertical.set_size_request(40, 30)
-        self.close_box_button.set_size_request(40, 30)
 
 
 
