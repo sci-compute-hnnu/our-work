@@ -1,5 +1,5 @@
 from Utils.Connector.SolverWrapper import SolverWrapper
-from Solve.Solver_3D.DG_3D import DG_3D
+from Solve.Solver_3D.DG_3D import PY_DG_3D
 
 
 class DockingSolver(SolverWrapper):
@@ -9,7 +9,7 @@ class DockingSolver(SolverWrapper):
 
         self.name = 'LinearDGSolver3D'
 
-        self.cell_type = 'triangle'
+        self.cell_type = 'tetrahedron'
 
         self.data_location = 'vertex'
 
@@ -20,9 +20,9 @@ class DockingSolver(SolverWrapper):
 
         mesh_file = kwargs['mesh_path']
 
-        triangleMesh = DG_3D.TriangleMesh()
-        triangleMesh.read_off(mesh_file)
-        triangleMesh.collect_faces()
+        tetrahedronMesh = PY_DG_3D.TetrahedronMesh()
+        tetrahedronMesh.read_off(mesh_file)
+        tetrahedronMesh.collect_faces()
         all_time = 2
-        self.solver = DG_3D.LinearDGSolver_3D(triangleMesh)
+        self.solver = PY_DG_3D.LinearDGSolver_3D_CycleBoundary(tetrahedronMesh)
         self.solver.computeTimeDiscretization(all_time)

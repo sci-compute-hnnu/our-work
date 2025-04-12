@@ -97,7 +97,13 @@ class SolverViewBoxConn:
 
         # 构造变量字典
         tem_var = {name: point_var if point_var.ndim == 1 else value for name, value in zip(self.var_names, point_var)}
-        self.meshClass.gl_var = {k: np.column_stack((np.zeros(len(v)), np.zeros(len(v)), v)) for k, v in tem_var.items()}
+
+        if self.meshClass.cell_type == 'triangle' or self.meshClass.cell_type == 'quadrilateral':
+            self.meshClass.gl_var = {k: np.column_stack((np.zeros(len(v)), np.zeros(len(v)), v)) for k, v in
+                                     tem_var.items()}
+        else:
+            self.meshClass.surface_mesh.gl_var = {k: np.column_stack((np.zeros(len(v)), np.zeros(len(v)), v)) for k, v
+                                                  in tem_var.items()}
 
 
     def cell_to_vertex_values(self, cellsData):
