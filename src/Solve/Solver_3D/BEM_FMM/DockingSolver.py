@@ -18,17 +18,14 @@ class DockingSolver(SolverWrapper):
         self.var = ['var']
 
 
-    def initializeSolver(self, file):
-
-        triangleMesh = CE_3D.TriangleMesh()
-        triangleMesh.read_off(file)
-        self.solver = CE_3D.BEM_3DCESolver(triangleMesh)
-
-
     def Solve(self, *args, **kwargs):
 
+        mesh_file = kwargs['mesh_path']
         g = kwargs['bc']  # 获取边值条件
 
+        triangleMesh = CE_3D.TriangleMesh()
+        triangleMesh.read_off(mesh_file)
+        self.solver = CE_3D.BEM_3DCESolver(triangleMesh)
         self.solver.ComputeSingularIntegral()
         self.solver.computeRHS(g)
         self.solver.preconditionsolve()

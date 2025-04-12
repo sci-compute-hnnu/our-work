@@ -361,11 +361,14 @@ class SolverWindow:
         self.three_layer.setup_combobox(0, ['Neutral Mode']+self.docking_solver.var, draw_var)
 
         """step3  加载渲染连接器"""
-        self.Connector.load_fit(self.notebook.showbox, self.two_layer.timer_entry, self.box1, freq, all_time)
+        self.Connector.load_fit(self.notebook.showbox, self.selectedMeshClass, self.two_layer.timer_entry, self.box1, freq, all_time)
 
-        """step4  执行求解"""
+        """step4  准备传入参数"""
         fixed_params = {}  # 固定的输入参数 如边界条件
         optional_args = ()  # 用户可自行选择的输入参数
+
+        # 文件地址
+        fixed_params['mesh_path'] = self.selectedMeshClass.file_path
 
         # 边值条件
         boundary_conditions = None
@@ -375,14 +378,13 @@ class SolverWindow:
         elif self.docking_solver.bc_input_type == self.bc_input_type_list[1]:  # 边值条件输入方式为python函数
             bc_pyfunc = self.bc_entry.get_text()
             boundary_conditions = self.execute_pyfunc(bc_pyfunc)  # 边值条件是函数表达式
-
         fixed_params['bc'] = boundary_conditions
+
 
         """关闭窗口"""""
         self.window.destroy()
 
         # 加载求解器(初始化)
-        self.docking_solver.initializeSolver(self.selectedMeshClass.file_path)
         self.Connector.load_solver(self.docking_solver)
 
         self.Connector.detectorWithRealTime(*optional_args, **fixed_params)

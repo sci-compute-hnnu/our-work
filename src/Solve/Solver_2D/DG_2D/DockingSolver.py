@@ -15,24 +15,14 @@ class DockingSolver(SolverWrapper):
 
         self.var = ['rho', 'vx', 'vy', 'E', 'p']
 
-    def initializeSolver(self, file):
-        triangleMesh = PY_DG_2D.TriangleMesh()
-        triangleMesh.read_off(file)
-        triangleMesh.collect_edges()
-        self.solver = PY_DG_2D.LinearDGSolver_2D_CycleBoundary(triangleMesh)
 
     def Solve(self, *args, **kwargs):
 
+        mesh_file = kwargs['mesh_path']
+
+        triangleMesh = PY_DG_2D.TriangleMesh()
+        triangleMesh.read_off(mesh_file)
+        triangleMesh.collect_edges()
         all_time = 2
+        self.solver = PY_DG_2D.LinearDGSolver_2D_CycleBoundary(triangleMesh)
         self.solver.computeTimeDiscretization(all_time)
-
-
-if __name__ == "__main__":
-
-
-    triangleMesh = PY_DG_2D.TriangleMesh()
-    triangleMesh.read_off('triangleMesh0.1.off')
-    triangleMesh.collect_edges()
-    solver = PY_DG_2D.LinearDGSolver_2D_CycleBoundary(triangleMesh)
-    all_time = 2
-    solver.computeTimeDiscretization(all_time)

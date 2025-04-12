@@ -30,13 +30,6 @@ class SolverWrapper(ABC):
 
         self.var = []  # 变量名
 
-        self.bc_pyfunc_default = ["1/np.sqrt((x[:,0]-1)**2+(x[:,1]-1)**2+(x[:,2]-1)**2)",
-                                  "1/np.sqrt(x[:,0]**2 + x[:,1]**2 + x[:,2]**2)"]   # 默认设置的边值条件函数
-
-
-    @abstractmethod
-    def initializeSolver(self, file):
-        pass
 
     @abstractmethod
     def Solve(self, *args, **kwargs):
