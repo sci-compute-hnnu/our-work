@@ -1,5 +1,5 @@
 from Utils.Connector.SolverWrapper import SolverWrapper
-# from Solve.Solver_3D.DG_3D import DG_3D
+from Solve.Solver_3D.DG_3D import DG_3D
 
 
 class DockingSolver(SolverWrapper):

@@ -8,6 +8,8 @@ from gi.repository import Gtk
 from Pre.MeshGeneration import _3D_generate_mesh
 from Utils.Mesh.MeshClass import BodyMesh
 from Utils.Config.path import ui_dir
+from Utils.Config.path import icon_dir
+
 
 class _3DMeshWindow:
 
@@ -76,6 +78,8 @@ class _3DMeshWindow:
 
         # 初始页面设置
         self.para_stack.set_visible_child_name("empty")
+        # 加载界面icon
+        self.load_icon()
 
         # 隐藏所有参数输入框
         self.hide_all_parameter_inputs()
@@ -86,6 +90,16 @@ class _3DMeshWindow:
     # 加载需要使用的部件
     def loadWidget(self, box1):
         self.box1 = box1
+
+
+    def load_icon(self):
+
+        _3d_dir = icon_dir + '/3DMesh/'
+        icon_names = ['sphere.png', 'cube.png', 'other.png']
+        widgets = ['sphe_image', 'cube_image', 'other_image']
+        icons = {name: self.builder.get_object(name) for name in widgets}
+        for widget, icon_name in zip(widgets, icon_names):
+            icons[widget].set_from_file(_3d_dir + icon_name)
 
     def hide_all_parameter_inputs(self):
         for widget in [self.page_cube, self.page_sphe, self.page_other]:

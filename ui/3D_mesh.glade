@@ -282,7 +282,7 @@
       <object class="GtkLabel">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes">   
+        <property name="label" translatable="yes">
    Input Example:[[3,1],[2,7],[8,6.5],[3,2],......]   
 </property>
       </object>
@@ -388,10 +388,9 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="sphe_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\3DMesh\sphere.png</property>
                       </object>
                     </child>
                   </object>
@@ -408,10 +407,9 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="cube_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\3DMesh\box.png</property>
                       </object>
                     </child>
                   </object>
@@ -428,10 +426,9 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="other_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\3DMesh\other.png</property>
                       </object>
                     </child>
                   </object>

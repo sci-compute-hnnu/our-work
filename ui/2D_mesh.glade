@@ -376,10 +376,9 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="cir_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\2DMesh\circle.png</property>
                       </object>
                     </child>
                   </object>
@@ -396,10 +395,9 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="rec_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\2DMesh\rectangle.png</property>
                       </object>
                     </child>
                   </object>
@@ -416,10 +414,9 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="other_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="pixbuf">../images\2DMesh\other.png</property>
                       </object>
                     </child>
                   </object>

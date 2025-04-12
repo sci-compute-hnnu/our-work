@@ -20,8 +20,8 @@ class Style():
     def set_icons(self, style_type):
         """ 根据样式加载图标 """
 
-        simple_dir = icon_dir+'MainPage/Simple/'
-        dark_dir = icon_dir+'MainPage/Dark/'
+        simple_dir = icon_dir+'/MainPage/Simple/'
+        dark_dir = icon_dir+'/MainPage/Dark/'
 
         # 统一的图标文件名（key 和文件名）
         icon_keys = [
@@ -81,7 +81,7 @@ class Style():
                 self.icons[icon_name].set_from_icon_name(icon_file, Gtk.IconSize.BUTTON)
 
 
-        default_dir = icon_dir + 'MainPage/Default/'
+        default_dir = icon_dir + '/MainPage/Default/'
 
         # 图标 key 和对应文件名
         custom_icon_keys = [

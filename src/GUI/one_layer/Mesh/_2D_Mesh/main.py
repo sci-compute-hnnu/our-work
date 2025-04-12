@@ -5,6 +5,7 @@ from gi.repository import Gtk
 from Pre.MeshGeneration import _2D_generate_mesh, _2D_generate_stru_mesh
 from Utils.Mesh.MeshClass import FaceMesh
 from Utils.Config.path import ui_dir
+from Utils.Config.path import icon_dir
 
 
 class _2DMeshWindow:
@@ -78,6 +79,8 @@ class _2DMeshWindow:
 
         # 初始页面设置
         self.para_stack.set_visible_child_name("empty")
+        # 加载窗口icon
+        self.load_icon()
 
         # 隐藏所有参数输入框
         self.selection.hide()
@@ -91,6 +94,18 @@ class _2DMeshWindow:
     # 加载需要使用的部件
     def loadWidget(self, box1):
         self.box1 = box1
+
+
+    def load_icon(self):
+
+        _2d_dir = icon_dir + '/2DMesh/'
+        icon_names = ['circle.png', 'rectangle.png', 'other.png']
+        widgets = ['cir_image', 'rec_image', 'other_image']
+        icons = {name: self.builder.get_object(name) for name in widgets}
+        for widget, icon_name in zip(widgets, icon_names):
+            icons[widget].set_from_file(_2d_dir + icon_name)
+
+
 
     # 隐藏参数
     def hide_all_parameter_inputs(self):

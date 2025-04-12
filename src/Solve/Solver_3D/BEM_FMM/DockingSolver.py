@@ -1,5 +1,5 @@
 from Utils.Connector.SolverWrapper import SolverWrapper
-# from Solve.Solver_3D.BEM_FMM import CE_3D
+from Solve.Solver_3D.BEM_FMM import CE_3D
 
 class DockingSolver(SolverWrapper):
 
