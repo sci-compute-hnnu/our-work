@@ -5,7 +5,7 @@ import Utils.Mesh.GeometryUtils as GeometryUtils
 # 面网格
 class FaceMesh():
 
-    def __init__(self, points, cells, cell_type, var={}, file_path=None):
+    def __init__(self, points, cells, cell_type, var={}, file_path=None,plane=None):
 
         """
         初始化 FaceMesh 对象
@@ -35,16 +35,20 @@ class FaceMesh():
         # 边  一维数组，每两个连续的元素表示一条边的两个顶点索引。
         self.gl_edges = GeometryUtils.extract_edges(cells, self.cell_type).flatten().astype(np.uint32)
         # 计算每个点的法向量
-        self.gl_normal = GeometryUtils.calculate_vertex_normals(points, cells)
+        self.gl_normal = GeometryUtils.calculate_vertex_normals(points, cells, plane)
         # 用于渲染的数据
         self.gl_var = {k: np.column_stack((np.zeros(len(v)), np.zeros(len(v)), v)) for k, v in var.items()}
 
+        # 用于线框模式的渲染
+        wireframe_cells, wireframe_edges = GeometryUtils.wireframe_data(self.gl_points, cells)
+        self.gl_wireframe_cells = wireframe_cells.flatten().astype(np.uint32)
+        self.gl_wireframe_edges = wireframe_edges.flatten().astype(np.uint32)
 
 
 # 体网格
 class BodyMesh:
 
-    def __init__(self, points, cells, cell_type=None, var={}, file_path=None):
+    def __init__(self, points, cells, cell_type=None, var={}, file_path=None, plane=None):
 
         """
         初始化 BodyMesh 对象
@@ -75,10 +79,10 @@ class BodyMesh:
         # 边  一维数组，每两个连续的元素表示一条边的两个顶点索引。
         self.gl_edges = GeometryUtils.extract_edges(cells, self.cell_type).flatten().astype(np.uint32)
         # 计算顶点法向量
-        self.gl_normal = GeometryUtils.calculate_vertex_normals(points,  self.gl_cells.reshape(-1, 3))
+        self.gl_normal = GeometryUtils.calculate_vertex_normals(points,  self.gl_cells.reshape(-1, 3), plane=plane)
         # 用于渲染的数据
         self.gl_var = {k: np.column_stack((np.zeros(len(v)), np.zeros(len(v)), v)) for k, v in var.items()}
 
         surface_cells = GeometryUtils.get_faces_from_volume_mesh(self.gl_cells, self.gl_points)
-        self.surface_mesh = FaceMesh(points, surface_cells, 'triangle', var)
+        self.surface_mesh = FaceMesh(points, surface_cells, 'triangle', var,None ,plane=plane)
 

@@ -29,19 +29,19 @@ def determine_tetra_or_quad(points, cells):
 
 
 # 用于计算每个顶点的法向量
-def calculate_vertex_normals(vertices, faces):
-
-
+def calculate_vertex_normals(vertices, faces, plane=None):
     # 用于计算每个面的法向量
     def calculate_face_normals(vertices, faces):
-
         # 计算面法线
         FN = np.zeros((len(faces), 3), dtype=np.float32)
         for i, f in enumerate(faces):
             v1 = vertices[f[1]] - vertices[f[0]]
             v2 = vertices[f[2]] - vertices[f[0]]
             FN[i] = np.cross(v1, v2)
-            FN[i] = FN[i] / np.linalg.norm(FN[i])
+            if np.linalg.norm(FN[i]) == 0:
+                FN[i] = np.array([0, 0, 0], dtype=np.float32)
+            else:
+                FN[i] = FN[i] / np.linalg.norm(FN[i])
         return FN
 
     # 计算面法向量
@@ -51,11 +51,22 @@ def calculate_vertex_normals(vertices, faces):
     VN = np.zeros(vertices.shape, dtype=np.float32)
 
     for i in range(len(vertices)):
+        if plane is not None:
+            a, b, c, d = plane
+            x, y, z = vertices[i]
+            if abs(a * x + b * y + c * z + d) < 1e-6:
+                VN[i] = np.array([a, b, c], dtype=np.float32)
+                continue
         faces_using = np.where(faces == i)[0]
         for j in faces_using:
             VN[i] += face_normals[j]
-        VN[i] = VN[i] / np.linalg.norm(VN[i])
+        if np.linalg.norm(VN[i]) != 0:
+            VN[i] = VN[i] / np.linalg.norm(VN[i])
+        else:
+            VN[i] = np.mean(face_normals, axis=0)
+
     return VN
+
 
 
 
@@ -216,5 +227,61 @@ def get_faces_from_volume_mesh(cells, vertices):
 
     return np.array(boundary_face, dtype=np.uint32)
 
+def wireframe_data(vertices, faces):
+    """
+    :param vertices: 包含正方体和内部几何体的所有顶点坐标数组，形状为 (n, 3)
+    :param faces: 所有面的顶点索引数组，形状为 (m, 3)
+    :return: 内部几何体的面以及正方体的边
+    """
+    # 首先计算出这个正方体的中心点
+    center = np.mean(vertices, axis=0)
+    # 找出距离这个正方体中心点最远的八个点的索引
+    distances = np.linalg.norm(vertices - center, axis=1)
+    farthest_indices = np.argsort(distances)[-8:]
 
+    # 将这8个点连接成12条边，将这个顶点的索引两两连接构成一条边
+    edges = []
+    for i in range(8):
+        for j in range(i + 1, 8):
+            edges.append((farthest_indices[i], farthest_indices[j]))
+    # 取出这些边距离最短的12条边
+    edges = sorted(edges, key=lambda x: np.linalg.norm(vertices[x[0]] - vertices[x[1]]))[:12]
+    cube_edges = np.array(edges, dtype=np.uint32)
 
+    # 将正方体的八个点的坐标中心点移动到原点
+    vertices = vertices - center
+    # 计算正方体的边界
+    min_x, max_x = np.min(vertices[:, 0]), np.max(vertices[:, 0])
+    min_y, max_y = np.min(vertices[:, 1]), np.max(vertices[:, 1])
+    min_z, max_z = np.min(vertices[:, 2]), np.max(vertices[:, 2])
+    # 对上面的min_x, max_x,min_y, max_y, min_z, max_z保留两位小数
+    min_x = round(min_x, 2)
+    max_x = round(max_x, 2)
+    min_y = round(min_y, 2)
+    max_y = round(max_y, 2)
+    min_z = round(min_z, 2)
+    max_z = round(max_z, 2)
+
+    inner_vertex_indices = []
+    # inner_point = []
+    for i, vertex in enumerate(vertices):
+        # 首先对这个点的坐标进行保留两位小数
+        vertex_new = np.round(vertex, 2)
+        # 判断这个点是否在正方体内,并且误差范围在0.01以内
+        if min_x < vertex_new[0] < max_x and min_y < vertex_new[1] < max_y and min_z < vertex_new[2] < max_z:
+            inner_vertex_indices.append(i)
+            # inner_point.append(vertex)
+
+    inner_face_indices = []
+    for i, face in enumerate(faces):
+        is_inner_face = all(index in inner_vertex_indices for index in face)
+        if is_inner_face:
+            inner_face_indices.append(face)
+
+    inner_faces = np.array(inner_face_indices, dtype=np.uint32)
+
+    # # 按照inner_point，重新映射inner_faces中点的索引
+    # inner_new_faces = np.array([[inner_vertex_indices.index(vertex) for vertex in face] for face in inner_faces], dtype=np.uint32)
+    cube_edges = np.array(cube_edges, dtype=np.uint32)
+
+    return inner_faces, cube_edges
