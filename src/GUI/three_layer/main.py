@@ -61,7 +61,7 @@ class three_layter():
     def reset_draw_states(self, showbox):
 
         glarea = showbox.glareaClass
-        glarea.edge_draw = glarea.face_draw = glarea.points_draw = glarea.var_draw = False
+        glarea.edge_draw = glarea.face_draw = glarea.points_draw = glarea.var_draw = glarea.gmsh_draw = glarea.wireframe_box = False
 
 
     # 选择在选项框中切换选项
@@ -186,6 +186,10 @@ class three_layter():
 
                     self.reset_draw_states(showbox)  # 重置
                     glarea.gmsh_draw = True
+
+                elif selected_value == 'Wireframe Box':
+                    self.reset_draw_states(showbox)
+                    glarea.wireframe_draw = True
 
                 showbox.queue_draw()  # 绘制更新
 

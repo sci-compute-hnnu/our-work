@@ -31,6 +31,8 @@ class base_glarea:
         self.faces_normal = []
         self.normal = []
         self.var = []
+        self.wireframe_edges = []
+        self.wireframe_faces = []
         self.var_opt = 'Neutral Mode'
         self.face_shape = None
 
@@ -86,6 +88,7 @@ class base_glarea:
         self.points_draw = False
         self.gmsh_draw = False
         self.var_draw = False
+        self.wireframe_draw = False
         self.is_show_smallAxes = True
 
         # 背景颜色（默认）
@@ -114,7 +117,9 @@ class base_glarea:
         self.vao = None  # 顶点数组对象
         self.vbo = None  # 顶点缓冲对象
         self.ibo1 = None  # 边索引缓冲对象
+        self.wireframe_ibo = None  # 线框索引缓冲对象
         self.ibo2 = None  # 面索引缓冲对象
+        self.wireframe_faces_ibo = None  # 线框面索引缓冲对象
 
         self.axes_vao = None  # 小坐标轴的顶点数组对象
         self.axes_vbo = None  # 小坐标轴的顶点缓冲对象
@@ -139,14 +144,20 @@ class base_glarea:
         """ 获取边面信息 """
         self.mesh = mesh
 
-        if mesh.cell_type == 'tetrahedron' or mesh.cell_type == 'hexahedron':
-            mesh = mesh.surface_mesh
-
         self.vertices = mesh.gl_points
         self.edges = mesh.gl_edges
-        self.faces = mesh.gl_cells
+
+        if mesh.cell_type == 'tetrahedron' or mesh.cell_type == 'hexahedron':
+            self.faces = mesh.surface_mesh.gl_cells
+            self.normal = mesh.surface_mesh.gl_normal
+            self.wireframe_edges = mesh.surface_mesh.gl_wireframe_edges
+            self.wireframe_faces = mesh.surface_mesh.gl_wireframe_cells
+            # self.wireframe_normal = mesh.surface_mesh.gl_wireframe_normal
+        else:
+            self.faces = mesh.gl_cells
+            self.normal = mesh.gl_normal
+
         self.vars = mesh.gl_var
-        self.normal = mesh.gl_normal
 
 
     def init_axes(self):
@@ -401,10 +412,22 @@ class base_glarea:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ibo1)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.edges.nbytes, self.edges, GL_STATIC_DRAW)
 
+        if len(self.wireframe_edges) != 0:
+            self.wireframe_ibo = glGenBuffers(1)
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.wireframe_ibo)
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.wireframe_edges.nbytes, self.wireframe_edges, GL_STATIC_DRAW)
+
+
         # 面索引缓冲对象
         self.ibo2 = glGenBuffers(1)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ibo2)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.faces.nbytes, self.faces, GL_STATIC_DRAW)
+
+        if len(self.wireframe_faces) != 0:
+            self.wireframe_faces_ibo = glGenBuffers(1)
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.wireframe_faces_ibo)
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.wireframe_faces.nbytes, self.wireframe_faces, GL_STATIC_DRAW)
+
 
         # # 小坐标轴索引缓冲对象
         # self.ibo3 = glGenBuffers(1)
@@ -581,6 +604,35 @@ class base_glarea:
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
             glDrawElements(GL_TRIANGLES, len(self.faces), GL_UNSIGNED_INT, None)
+
+        if self.wireframe_draw:  # 绘制物体的线框
+            """ 将变量传至着色器 """
+            glUniform4fv(self.edgeColor_location, 1, self.edge_color)
+            glUniform1i(self.isGmsh_location, False)
+            glUniform1i(self.isEdge_location, True)
+            glUniform1i(self.isPoint_location, False)
+            glUniform1i(self.isVar_location, False)
+
+            glLineWidth(1.0)
+
+            """ 启用边的IBO对象 """
+            # 将索引缓冲区对象绑定到GL_ELEMENT_ARRAY_BUFFER目标上
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.wireframe_ibo)
+
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+            glDrawElements(GL_LINES, len(self.wireframe_edges), GL_UNSIGNED_INT, None)
+
+            """ 将变量传至着色器 """
+            glUniform4fv(self.faceColor_location, 1, self.face_color)
+            glUniform1i(self.isEdge_location, False)
+
+            """ 启用面的IBO对象 """
+            # 将索引缓冲区对象绑定到GL_ELEMENT_ARRAY_BUFFER目标上
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.wireframe_faces_ibo)
+
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+
+            glDrawElements(GL_TRIANGLES, len(self.wireframe_faces), GL_UNSIGNED_INT, None)
 
         if self.is_show_smallAxes:
             self.draw_small_axes()
