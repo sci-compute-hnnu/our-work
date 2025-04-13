@@ -138,12 +138,12 @@ class base_glarea:
 
         """ 获取边面信息 """
         self.mesh = mesh
+        self.vertices = mesh.gl_points
+        self.edges = mesh.gl_edges
 
         if mesh.cell_type == 'tetrahedron' or mesh.cell_type == 'hexahedron':
             mesh = mesh.surface_mesh
 
-        self.vertices = mesh.gl_points
-        self.edges = mesh.gl_edges
         self.faces = mesh.gl_cells
         self.vars = mesh.gl_var
         self.normal = mesh.gl_normal

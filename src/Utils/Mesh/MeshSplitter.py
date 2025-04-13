@@ -354,7 +354,7 @@ class MeshSplitter:
 
         return tetrahedral, tetrahedral_vertex
 
-    def split_tetrahedron(self,vertices, cells, plane, var={}):
+    def split_tetrahedron(self, vertices, cells, plane, var={}):
         """
         根据平面将网格划分为两部分
 
@@ -370,16 +370,14 @@ class MeshSplitter:
         tetrahedrons_after_split_positive = []
         split_face_cells = []
 
-
         intersection_points_total = []
 
         intersection_points_with_var = {}
         var_final = {}
 
-        if var!={}:
+        if var != {}:
             intersection_points_with_var = {k: [] for k in var.keys()}
             var_final = {k: [] for k in var.keys()}
-
 
         # 遍历每个四面体
         for cell in cells:
@@ -394,14 +392,12 @@ class MeshSplitter:
 
                 # 循环计算交点的var，这里的var是一个字典,包含‘rho’,‘x’,‘y’,‘z’,以及对应的v各个顶点的四个值
                 for i in var.keys():
-                    var_value = []
                     for point in intersection_points:
-                        var_value.append(tetrahedral_lagrange_interpolation(point, tet[0], tet[1], tet[2], tet[3],
-                                                                            var[i][cell[0]], var[i][cell[1]],
-                                                                            var[i][cell[2]], var[i][cell[3]]))
+                        var_value = tetrahedral_lagrange_interpolation(point, tet[0], tet[1], tet[2], tet[3],
+                                                                       var[i][cell[0]], var[i][cell[1]],
+                                                                       var[i][cell[2]], var[i][cell[3]])
 
-                    intersection_points_with_var[i].append([point, var_value])
-
+                        intersection_points_with_var[i].append([point, var_value])
             intersection_points_total.extend(intersection_points)
 
             # 当平面与四面体只有一个交点时
@@ -410,9 +406,9 @@ class MeshSplitter:
 
                 # 判断此时如果所有的顶点都在negative_or_positive所要求的一侧，则直接将此四面体加入到tetrahedrons_after_split中
                 distances = np.array([plane[0] * x + plane[1] * y + plane[2] * z + plane[3] for x, y, z in new_tet])
-                if all(distances >= 0) :
+                if all(distances >= 0):
                     tetrahedrons_after_split_positive.append(tet)
-                elif all(distances <= 0) :
+                elif all(distances <= 0):
                     tetrahedrons_after_split_negative.append(tet)
                 else:
                     continue
@@ -422,10 +418,12 @@ class MeshSplitter:
                 intersection_points = self.sort_points_counterclockwise(intersection_points)
                 # 将上面三个交点放入到split_cells中
                 split_face_cells.append(intersection_points)
-                tetrahedra_negative, tetrahedra_vertex_negative = self.split_tetrahedron_three(intersection_points, tet, plane,
-                                                                        "negative")
-                tetrahedra_positive, tetrahedra_vertex_positive = self.split_tetrahedron_three(intersection_points, tet, plane,
-                                                                        "positive")
+                tetrahedra_negative, tetrahedra_vertex_negative = self.split_tetrahedron_three(intersection_points, tet,
+                                                                                               plane,
+                                                                                               "negative")
+                tetrahedra_positive, tetrahedra_vertex_positive = self.split_tetrahedron_three(intersection_points, tet,
+                                                                                               plane,
+                                                                                               "positive")
                 if tetrahedra_positive is not None:
                     tetrahedrons_after_split_positive.extend(tetrahedra_positive)
                 if tetrahedra_negative is not None:
@@ -453,9 +451,9 @@ class MeshSplitter:
                     split_face_cells.append([intersection_points[0], intersection_points[1], intersection_points[2]])
 
                 negative_tetrahedra, negative_side = self.split_tetrahedron_four(intersection_points, tet, plane,
-                                                                            "negative")
+                                                                                 "negative")
                 positive_tetrahedra, positive_side = self.split_tetrahedron_four(intersection_points, tet, plane,
-                                                                            "positive")
+                                                                                 "positive")
                 if negative_tetrahedra is not None:
                     tetrahedrons_after_split_negative.extend(negative_tetrahedra)
                 if positive_tetrahedra is not None:
@@ -469,26 +467,28 @@ class MeshSplitter:
                 elif status == "positive":
                     tetrahedrons_after_split_positive.append(tet)
                 else:
+                    print("Error: tetrahedron is not valid")
                     continue
 
         # 注意：这里可能存在一个问题，就是原来顶点的var与交点之后的var可能会出现问题
         # intersection_points_with_var中一样的点的var值取平均值
         if len(intersection_points_with_var) != 0:
-            for i in intersection_points_with_var.keys():
-                intersection_points_with_var[i] = np.array(intersection_points_with_var[i])
-                intersection_points = intersection_points_with_var[i][:, 0]
-                intersection_points_var = intersection_points_with_var[i][:, 1]
-                unique_intersection_points = np.unique(intersection_points, axis=0)
-                intersection_points_with_var[i] = []
-                for point in unique_intersection_points:
-                    index = np.where(np.all(intersection_points == point, axis=1))[0]
-                    var_value = np.mean(intersection_points_var[index])
-                    intersection_points_with_var[i].append([point, var_value])
+            intersection_points_with_var[i] = np.array(intersection_points_with_var[i])
+            intersection_points = intersection_points_with_var[i][:, 0]
+            intersection_points_var = intersection_points_with_var[i][:, 1]
+            unique_intersection_points = np.unique(intersection_points, axis=0)
+            intersection_points_with_var[i] = []
+            for point in unique_intersection_points:
+                index = np.where(np.all(intersection_points == point, axis=1))[0]
+                var_value = np.max(intersection_points_var[index])
+                intersection_points_with_var[i].append([point, var_value])
         tetrahedrons_after_split_negative = np.array(tetrahedrons_after_split_negative, dtype=np.float32)
         tetrahedrons_after_split_positive = np.array(tetrahedrons_after_split_positive, dtype=np.float32)
 
-        new_tetrahedrons_negative = np.zeros((tetrahedrons_after_split_negative.shape[0], tetrahedrons_after_split_negative.shape[1]), dtype=int)
-        new_tetrahedrons_positive = np.zeros((tetrahedrons_after_split_positive.shape[0], tetrahedrons_after_split_positive.shape[1]), dtype=int)
+        new_tetrahedrons_negative = np.zeros(
+            (tetrahedrons_after_split_negative.shape[0], tetrahedrons_after_split_negative.shape[1]), dtype=int)
+        new_tetrahedrons_positive = np.zeros(
+            (tetrahedrons_after_split_positive.shape[0], tetrahedrons_after_split_positive.shape[1]), dtype=int)
         # 对vertices_after_split去重
         intersection_points_total = np.array(intersection_points_total)
         intersection_points_total = np.unique(intersection_points_total, axis=0)
@@ -496,16 +496,20 @@ class MeshSplitter:
         # 对于vertices_after_split中的每个顶点，只是重新计算了非顶点的交点的var值
         for i in var_final.keys():
             var_final[i].extend(var[i])
-            for j in intersection_points_with_var[i]:
-                index = self.find_vertex_index(j[0], intersection_points_total)
+            for vertex in intersection_points_total:
+                # 直接在 intersection_points_with_var 中查找顶点
+                index = self.find_vertex_index(vertex, [item[0] for item in intersection_points_with_var[i]])
                 if index is not None:
-                    var_final[i].append(j[1])
+                    var_final[i].append(intersection_points_with_var[i][index][1])
                 else:
-                    var_final[i].append(np.mean(var[i]))
+                    var_final[i].append(np.mean(var))
 
             for j, value in enumerate(var_final[i]):
                 if isinstance(value, (int, float)):
-                    var_final[i][j] = [0, 0, value]
+                    var_final[i][j] = value
+                else:
+                    var_final[i][j] = value[2]
+            var_final[i] = np.array(var_final[i], dtype=np.float32)
 
         # intersection_points_total
         vertices_after_split = np.vstack((vertices, intersection_points_total))
@@ -529,7 +533,7 @@ class MeshSplitter:
 
         split_face_cells = np.array(split_face_cells, dtype=int)
 
-        return tetrahedrons_after_split_negative,tetrahedrons_after_split_positive, vertices_after_split, split_face_cells, var_final
+        return tetrahedrons_after_split_negative, tetrahedrons_after_split_positive, vertices_after_split, split_face_cells, var_final
 
 
     def split(self):
