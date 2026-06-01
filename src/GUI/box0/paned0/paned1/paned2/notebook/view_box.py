@@ -46,24 +46,35 @@ class view_box():
         self.color_opt = ' '  # 默认绘制方式是Neutral Mode
         self.type_opt = ' '
 
-        self.should_draw = -1  # 是否进行绘制 (-1表示不绘制 0, 1, 2, 3表示绘制的网格索引号)
+        # 当前要绘制的网格索引列表（空 = 只渲染背景）
+        self.should_draw = []
+        # 缓存的网格对象列表，供 color_opt 切换时重建用
+        self.current_mesh_list = []
 
 
     def on_render(self, area, contex):
 
-        if self.should_draw == -1:  # 只渲染背景
-            self.glareaClass.mesh = None
+        if not self.should_draw:  # 只渲染背景
             self.glareaClass.on_render_background(area, contex)
 
         else:
             self.glareaClass.on_render(area, contex)
 
 
-    def on_realize(self, mesh=None, rotation_matrix=None):
+    def on_realize(self, mesh_list=None, rotation_matrix=None):
 
-        if mesh != None:
-            self.glareaClass.load_mesh(mesh)
-        self.glareaClass.on_realize(rotation_matrix=rotation_matrix, color_opt=self.color_opt)
+        if mesh_list is not None:
+            self.current_mesh_list = mesh_list
+            self.glareaClass.var_opt = self.color_opt
+            self.glareaClass.initialize_shared(mesh_list, rotation_matrix=rotation_matrix)
+        elif rotation_matrix is not None:
+            self.glareaClass.rotation_matrix = rotation_matrix.astype('float32')
+
+    def rebuild_for_color_change(self):
+        """color_opt 切换时重建所有网格的 VBO（var 数据需更新）。"""
+        if self.current_mesh_list:
+            self.glareaClass.var_opt = self.color_opt
+            self.glareaClass.rebuild_all_bundles(self.current_mesh_list)
 
 
     def queue_draw(self):
@@ -76,4 +87,8 @@ class view_box():
 
     def get_current_mesh(self):
 
-        return self.glareaClass.mesh
+        bundles = self.glareaClass.mesh_bundles
+        if not bundles:
+            return None
+        first_idx = min(bundles.keys())
+        return bundles[first_idx].get('mesh', None)

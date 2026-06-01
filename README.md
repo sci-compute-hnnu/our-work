@@ -10,47 +10,5 @@
 
  (详情参考https://pybind11.readthedocs.io/en/stable/basics.html)
 
-本项目第三方图形界面采用GTK, 如在Ubuntu自带python解释器上启动该项目，无需安装GTK(PyGobject), 
-在解释器环境中输入
-
-```python
-import gi
-```
-
-显示无错，则安装后续依赖后即可正常运行。
-
-如在非原生python解释器 如在anaconda3的虚拟环境中启动时，需提前下载PyGobject依赖，
-使用apt管理器安装以下依赖
-
-```bash
-sudo apt-get update
-sudo apt-get install -y pkg-config libcairo2-dev
-sudo apt-get install -y gobject-introspection libgirepository1.0-dev
-```
-
-安装完上述依赖后使用pip安装PyGObject即可
-
-```shell
-pip install PyGObject
-```
-
-安装其他软件包
-
-```shell
-pip install -r requirements.txt
-```
-
-启动
-
-```bash
-sh run.sh
-```
-
-
-
-注: 本项目现有的C++代码实现的求解器pymodule(动态库文件 .so)均只支持python=3.11。
-如需使用现有的求解模块建议采用anaconda3的conda包管理器安装python=3.11的虚拟环境：
-
-```bash
-conda create -n GTK python=3.11
-```
+开发文档见：doc/developmet-manual.md
+启动文档见：doc/setup-linux.md

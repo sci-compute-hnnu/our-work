@@ -84,7 +84,8 @@ class box1:
                 model.remove(iter)  # path 就是0 , 1 ,2 索引 每次path_list只有一个
                 self.MeshList.pop(int(str(path)))  # 移除该面网格数据
 
-            showbox.should_draw = self.find_true_row()
+            showbox.should_draw = self.find_true_rows()
+            self._apply_mesh_list(showbox)
             showbox.queue_draw()
 
     def apply_clicked(self, button, showbox):
@@ -108,8 +109,8 @@ class box1:
                 model.set_value(iter, 0, True)
 
             # 更新绘制
-            showbox.should_draw = self.find_true_row()
-            showbox.on_realize(mesh=self.MeshList[showbox.should_draw])
+            showbox.should_draw = self.find_true_rows()
+            self._apply_mesh_list(showbox)
             showbox.queue_draw()
 
     def reset_clicked(self, button, showbox):
@@ -123,8 +124,18 @@ class box1:
                 iter = model.get_iter(path)
                 model.set_value(iter, 0, False)
 
-            showbox.should_draw = self.find_true_row()
+            showbox.should_draw = self.find_true_rows()
+            self._apply_mesh_list(showbox)
             showbox.queue_draw()
+
+    def _apply_mesh_list(self, showbox):
+        """根据 should_draw 列表重新初始化渲染器。"""
+        if showbox.should_draw:
+            mesh_list = [self.MeshList[i] for i in showbox.should_draw]
+            old_rotation = showbox.get_last_rotation()
+            showbox.on_realize(mesh_list=mesh_list, rotation_matrix=old_rotation)
+        else:
+            showbox.glareaClass.mesh_bundles.clear()
 
     # information框打印信息
     def info_print(self, info):
@@ -142,7 +153,7 @@ class box1:
         end_iter = buffer.get_end_iter()
         buffer.insert_with_tags(end_iter, info, font_tag)
 
-    # 更新状态栏打勾和绘制
+    # 更新状态栏打勾和绘制 (支持多网格同时显示)
     def on_toggle_button_toggled(self, cell, path_str, showbox, select_var_box, setup_combobox):
 
         # 将路径字符串转换为TreePath对象
@@ -155,68 +166,47 @@ class box1:
         # step2: 获取当前行的True or False值
         value = self.list_store.get_value(current_iter, 0)
 
-        # step3: 如果当前是打勾状态，则取消其他的勾选
-        if value:
-            # 迭代 ListStore 中的所有其他行
-            for row in self.list_store:
-                # 如果不是当前行，则取消勾选
-                if row.path != path:
-                    self.list_store[row.iter][0] = False
-
-        # step4: 以当前状态记录并更新showbox的list_store_state
+        # step3: 以当前状态记录并更新showbox的list_store_state
         showbox.list_store_state = self.record_status_from_list_store()
-        showbox.color_opt = 'Neutral Mode'
-        showbox.color_opt_list = ['Neutral Mode']
 
-        # step5: 更新viewbox的color_opt
-        if value:
-            mesh = self.MeshList[showbox.should_draw]  # 获取字典var 将字典的keys添加至color_opt_list (注意判断mesh里有没有var)
+        # step4: 更新viewbox的color_opt (取第一个勾选的网格来设置选项)
+        checked_rows = self.find_true_rows()
+        if checked_rows:
+            first_mesh = self.MeshList[checked_rows[0]]
             showbox.color_opt = 'Neutral Mode'
             showbox.type_opt = 'Surface'
-            if len(mesh.gl_var) != 0:
-                showbox.color_opt_list = ['Neutral Mode'] + list(mesh.gl_var.keys())
+            if len(first_mesh.gl_var) != 0:
+                showbox.color_opt_list = ['Neutral Mode'] + list(first_mesh.gl_var.keys())
             else:
                 showbox.color_opt_list = ['Neutral Mode']
 
-            if mesh.cell_type == 'triangle' or mesh.cell_type == 'quadrilateral' :
+            if first_mesh.cell_type == 'triangle' or first_mesh.cell_type == 'quadrilateral':
                 showbox.type_opt_list = face_mesh_type
             else:
                 showbox.type_opt_list = volume_mesh_type
-
         else:
             showbox.color_opt = ' '
             showbox.type_opt = ' '
             showbox.color_opt_list = [' ']
             showbox.type_opt_list = [' ']
 
+        # step5: 更新绘制
+        showbox.should_draw = checked_rows
+        self._apply_mesh_list(showbox)
+        showbox.queue_draw()
 
-        # step6: 更新是否绘制, 以及绘制谁
-        if value:
-            showbox.should_draw = self.find_true_row()
-            showbox.on_realize(mesh=self.MeshList[showbox.should_draw])
-            showbox.queue_draw()
-        else:
-            showbox.should_draw = self.find_true_row()
-            showbox.queue_draw()
-
-        # step7: 更新three_layer的select_var_box
-        if value:
+        # step6: 更新three_layer的select_var_box
+        if checked_rows:
             setup_combobox(0, showbox.color_opt_list, showbox.color_opt)
             setup_combobox(1, showbox.type_opt_list, showbox.type_opt)
-
         else:
             setup_combobox(0)  # 设置选择框无内容以及无法点击
             setup_combobox(1)  # 设置选择框无内容以及无法点击
 
 
-    # 找到为True的索引 (该阶段为True的一个)
-    def find_true_row(self):
-        # 遍历list_store中的所有条目
-        for i, row in enumerate(self.list_store):
-            # 如果这一行的状态为True，则返回它的索引
-            if row[0]:
-                return i
-        return -1
+    # 找到所有为True的索引
+    def find_true_rows(self):
+        return [i for i, row in enumerate(self.list_store) if row[0]]
 
     # 读取网格文件, 并存入列表
     def load_Mesh_file(self, filename):

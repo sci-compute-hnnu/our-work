@@ -29,33 +29,77 @@ def determine_tetra_or_quad(points, cells):
 
 
 # 用于计算每个顶点的法向量
+# def calculate_vertex_normals(vertices, faces):
+
+
+#     # 用于计算每个面的法向量
+#     def calculate_face_normals(vertices, faces):
+
+#         # 计算面法线
+#         FN = np.zeros((len(faces), 3), dtype=np.float32)
+#         for i, f in enumerate(faces):
+#             v1 = vertices[f[1]] - vertices[f[0]]
+#             v2 = vertices[f[2]] - vertices[f[0]]
+#             FN[i] = np.cross(v1, v2)
+#             FN[i] = FN[i] / np.linalg.norm(FN[i])
+#         return FN
+
+#     # 计算面法向量
+#     face_normals = calculate_face_normals(vertices, faces)
+
+#     # 计算顶点法向量
+#     VN = np.zeros(vertices.shape, dtype=np.float32)
+
+#     for i in range(len(vertices)):
+#         faces_using = np.where(faces == i)[0]
+#         for j in faces_using:
+#             VN[i] += face_normals[j]
+#         VN[i] = VN[i] / np.linalg.norm(VN[i])
+#     return VN
+
 def calculate_vertex_normals(vertices, faces):
+    """
+    进一步优化的版本，使用bincount进行累加
+    """
+    # 1. 计算面法向量（向量化）
+    v0 = vertices[faces[:, 0]]
+    v1 = vertices[faces[:, 1]]
+    v2 = vertices[faces[:, 2]]
 
+    edge1 = v1 - v0
+    edge2 = v2 - v0
+    face_normals = np.cross(edge1, edge2)
 
-    # 用于计算每个面的法向量
-    def calculate_face_normals(vertices, faces):
+    # 归一化
+    norms = np.linalg.norm(face_normals, axis=1, keepdims=True)
+    norms = np.where(norms > 0, norms, 1.0)
+    face_normals = face_normals / norms
 
-        # 计算面法线
-        FN = np.zeros((len(faces), 3), dtype=np.float32)
-        for i, f in enumerate(faces):
-            v1 = vertices[f[1]] - vertices[f[0]]
-            v2 = vertices[f[2]] - vertices[f[0]]
-            FN[i] = np.cross(v1, v2)
-            FN[i] = FN[i] / np.linalg.norm(FN[i])
-        return FN
+    # 2. 使用bincount方法累加顶点法向量
+    n_vertices = len(vertices)
 
-    # 计算面法向量
-    face_normals = calculate_face_normals(vertices, faces)
+    # 展平面和法向量用于累加
+    flat_faces = faces.ravel()
+    flat_normals = np.repeat(face_normals, 3, axis=0)
 
-    # 计算顶点法向量
-    VN = np.zeros(vertices.shape, dtype=np.float32)
+    # 对每个顶点的法向量进行累加
+    VN = np.zeros((n_vertices, 3), dtype=np.float32)
 
-    for i in range(len(vertices)):
-        faces_using = np.where(faces == i)[0]
-        for j in faces_using:
-            VN[i] += face_normals[j]
-        VN[i] = VN[i] / np.linalg.norm(VN[i])
+    # 分别对x, y, z分量使用bincount
+    for i in range(3):
+        VN[:, i] = np.bincount(
+            flat_faces,
+            weights=flat_normals[:, i],
+            minlength=n_vertices
+        )
+
+    # 3. 归一化
+    vn_norms = np.linalg.norm(VN, axis=1, keepdims=True)
+    vn_norms = np.where(vn_norms > 0, vn_norms, 1.0)
+    VN = VN / vn_norms
+
     return VN
+
 
 
 

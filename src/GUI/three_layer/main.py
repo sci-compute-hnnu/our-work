@@ -215,7 +215,7 @@ class three_layter():
                 glarea.var_draw = True
 
             if self.tigger and selected_value != ' ':
-                showbox.on_realize(rotation_matrix=showbox.get_last_rotation())
+                showbox.rebuild_for_color_change()
             showbox.queue_draw()
 
 

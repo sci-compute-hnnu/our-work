@@ -163,14 +163,19 @@ class SolverViewBoxConn:
 
         self.old_rotation_matrix = self.showbox.glareaClass.rotation_matrix.copy()
 
-        now_value = self.docking_solver.solver.getRenderingData()  # 更新渲染值
+        try:
+            now_value = self.docking_solver.solver.getRenderingData()  # 更新渲染值
+        except AttributeError:
+            # 求解器线程尚未创建 solver 对象，等待下次轮询
+            return True
 
         if not (np.allclose(self.old_value, now_value, rtol=1e-08, atol=1e-08)):
 
             self.render_step += 1
             self.load_var()  # 加载变量的值
 
-            self.showbox.on_realize(mesh=self.meshClass, rotation_matrix=self.old_rotation_matrix)
+            mesh_list = [self.box1.MeshList[i] for i in self.showbox.should_draw]
+            self.showbox.on_realize(mesh_list=mesh_list, rotation_matrix=self.old_rotation_matrix)
             self.showbox.queue_draw()
             self.old_value = now_value.copy()  # 更新前一步值
             # 记录每一步的值

@@ -3,12 +3,17 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 from gi.repository import Gtk
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../src"))
+
 from GUI.box0.main import box0
 from GUI.one_layer.main import one_layer
 from GUI.two_layer.main import two_layer
 from GUI.three_layer.main import three_layter
 
 from Utils.Config.path import ui_dir
+
 
 
 class UI():

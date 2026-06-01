@@ -354,7 +354,7 @@ class SolverWindow:
             # 检查是否匹配
             if currentMeshName == meshName:
                 self.selectedMeshClass = self.box1.MeshList[index]  # 获取当前的索引
-                self.notebook.showbox.should_draw = index   # 更新should_draw
+                self.notebook.showbox.should_draw = [index]   # 更新should_draw（列表）
                 break
 
         """step2  设置three_layer的var_combobox"""
